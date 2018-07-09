@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>添加供应商信息</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .control-label{
+            width: 110px;
+        }
+        .wrap{
+            width: 700px;
+            height: 100%;
+            padding-left: 15px;
+            padding-top: 0px!important;
+        }
+        .wrap-top{
+            height: 45px;
+            line-height:60px;
+            border-bottom: 1px solid #2e8ded;
+        }
+        .wrap-top span{
+            padding: 5px 10px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .showInfo{
+            background-color: #2e8ded;
+            color: #fff;
+            border-radius: 4px 4px 0 0;
+        }
+        .itsoft-datagrid{
+            height: 405px!important;
+        }
+        .datagrid-body{
+            height: 368px!important;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+        .point{
+            margin-right: 5px;
+            color: red;
+        }
+        .upFile{
+            cursor: pointer;
+            color: #00a0e9;
+        }
+        .selectrow .upFile{
+            color: #fff!important;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10 wrap">
+       <div class="wrap-top">
+           <span class="showInfo" data-id="1">基本信息</span>
+           <span data-id="2">相关证件</span>
+       </div>
+       <div class="wrap-bd" style="height: 100%">
+           <div class="JbXX" style="margin-top: 15px">
+               <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningSupplier/insertDiningSupplier'}" method="post" >
+                   <input type="hidden" id="qualificationsJsonStr" name="qualificationsJsonStr">
+                   <div class="form-group row">
+                       <label class="control-label"><i class="point">*</i>供应商名称：</label>
+                       <div style="width: 510px;position: relative">
+                           <input type="text" name="name" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">登录账号：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="number" value="" class="form-control" placeholder="请输入">
+                       </div>
+                       <label class="control-label">简称：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="shortName" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label"><i class="point">*</i>联系人：</label>
+                       <div style="width: 200px;position: relative">
+                           <input type="text" name="linkman" value="" class="form-control" placeholder="请输入">
+                       </div>
+                       <label class="control-label"><i class="point">*</i>联系电话：</label>
+                       <div style="width: 200px;position: relative">
+                           <input type="text" name="linkPhone" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">电子邮件：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="email" value="" class="form-control" placeholder="请输入">
+                       </div>
+                       <label class="control-label">传真：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="fax" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">银行账户：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="bankAccount" value="" class="form-control" placeholder="请输入">
+                       </div>
+                       <label class="control-label">开户行：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="bank" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">税号：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="taxNo" value="" class="form-control" placeholder="请输入">
+                       </div>
+                       <label class="control-label">许可证：</label>
+                       <div style="width: 200px">
+                           <input type="text" name="licence" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">地址：</label>
+                       <div style="width: 510px">
+                           <input type="text" name="address" value="" class="form-control" placeholder="请输入">
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">备注：</label>
+                       <div style="width: 510px">
+                           <textarea type="text" name="remark" placeholder="请输入" class="form-control"></textarea>
+                       </div>
+                   </div>
+                   <div class="form-group row">
+                       <label class="control-label">系统用户：</label>
+                       <div style="margin-top: 5px;width: 500px;">
+                           <div class="check-box">
+                               <input type="checkbox" id="checkbox-1" data-tip="1"  name="isManager" value="1">
+                               <label for="checkbox-1">是</label>
+                           </div>
+                       </div>
+                   </div>
+               </form>
+           </div>
+           <div class="ZzXX" style="display: none">
+               <div class="itsoft-toolbar" id="toolBtn" style="border-top: 0"></div>
+               <div class="itsoft-datagrid" id="datagrid" style="border-top: 0"></div>
+           </div>
+       </div>
+       <div class="btnBox">
+           <div>
+               <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+               <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+           </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}" type="text/javascript" ></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var datagrid;
+    var index=parent.layer.getFrameIndex(window.name);
+    var isSave = false;
+    var loadingindex;
+    $(function () {
+        $('.check-box input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        $('.wrap-top').on('click','span',function () {
+            $(this).addClass('showInfo').siblings().removeClass('showInfo');
+            if($(this).attr('data-id')==1){
+                $('.JbXX').show();
+                $('.ZzXX').hide();
+            }else {
+                $('.JbXX').hide();
+                $('.ZzXX').show();
+            }
+        });
+        /*** 资质信息* */
+            //按钮
+           $('#toolBtn').toolbarbtn({
+               btn:[
+                   {
+                       text:'添加',
+                       title:'添加',
+                       icon:'iconfont-add',
+                       click:function () {
+                            addZs()
+                       }
+                   },
+                   {
+                       text:'编辑',
+                       title:'编辑',
+                       icon:'iconfont-edit',
+                       click:function () {
+                         editZs()
+                       }
+                   },
+                   {
+                       text:'删除',
+                       title:'删除',
+                       icon:'iconfont-del2',
+                       click:function () {
+                          delZs()
+                       }
+                   }
+               ]
+           });
+
+           //表格
+
+      datagrid=$('#datagrid').datagrid({
+            keyField: "orderid",
+            page:false,
+            url: '../../../../../../data/dataRow.json',
+            type: 'GET',
+            line: "both",
+            isSequence: false,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                }, {
+                    field:'picturePath',
+                    isshow:false
+                }, {
+                    field:'fileUrl',
+                    isshow:false
+                }, {
+                    field:'fileName',
+                    isshow:false
+                },{
+                    title: '证件名称',
+                    field: 'name',
+                    align: "center",
+                    width: '120',
+                   formatter:function () {
+                   }
+                },
+                {
+                    title: '证件号',
+                    field: 'number',
+                    align: "center",
+                    width: '120',
+                   formatter:function () {
+                   }
+                },
+                {
+                    title: '有效日期',
+                    field: 'effectiveDate',
+                    align: "center",
+                    width: '200',
+                   formatter:function () {
+                   }
+                },
+                {
+                    title: '附件',
+                    field: 'file',
+                    align: "left",
+                    width: '230',
+                    widthfix:true,
+                   formatter:function (v,i,r) {
+                       var fileUrl = r.fileUrl;
+                       var fileName = r.fileName;
+                       var id = r.id;
+                       if (fileUrl.length == 0){
+                           return '<span class="upFile">未上传</span>'
+                       }else{
+                           return '<span class="chcekFile" style="cursor: pointer;" data-id="'+id+'" file-url="'+fileUrl+'" file-name="'+fileName+'">查看</span>'
+                       }
+                   }
+                }
+            ]
+        });
+
+        //添加证书
+        function addZs() {
+            ITSOFT.itWin.open({
+                title:'添加证书',
+                area:['512px','450px'],
+                content:['[[${root}]]/redirect/system/addQualifications','no']
+            })
+        }
+        //编辑
+        function editZs() {
+            var row=datagrid.getSelectedRow();
+            if(row.length==0){
+                parent.ITSOFT.tools.showMsg('error','请选择要编辑的行')
+                return false
+            }
+            ITSOFT.itWin.open({
+                title:'编辑证书',
+                area:['600px','450px'],
+                content:['[[${root}]]/redirect/system/editQualifications','no']
+            });
+        }
+        //删除
+        function delZs() {
+            var row=datagrid.getSelectedRow();
+            if(row.length==0){
+                ITSOFT.tools.showMsg('error','请选择要删除的行');
+                return false
+            }
+            var msgtxt = "确定要删除吗？";
+            ITSOFT.itWin.confirm(msgtxt, function() {
+              $(row).fadeTo("slow", 0.02, function() {
+                $(this).slideUp("fast", function() {
+                  $(this).remove();
+                });
+              });
+
+            });
+        }
+
+
+
+        /*** END* **/
+        //验证
+        $("#addform").validate({
+            rules: {
+                number: {
+                    required: true,
+                    minlength: 2,
+                    maxlength: 20
+                },
+                name: {
+                    required: true
+                },
+                linkman: {
+                    required: true
+                },
+                linkPhone: {
+                    required: true,
+                    isTel:true
+                }
+            },
+            messages: {
+                linkPhone: {
+                    isTel:"请输入正确的电话号码"
+                }
+            },
+            onkeyup: false,
+            focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+            success: "valid",
+            submitHandler: function(form) {
+                $(form).ajaxSubmit({
+                    beforeSend: function () {
+                        if (isSave) {
+                            parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                            return false;
+                        }
+                        isSave = true;
+                        loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success:function(data){
+                        //提交成功后
+                        isSave = false;
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        if(data.errorCode==0){
+                            parent.datagrid.insertRow(data.data);
+                            parent.ITSOFT.tools.showMsg("ok",data.message);
+                            parent.ITSOFT.itWin.close(index);
+                        }else{
+                            parent.ITSOFT.tools.showMsg("error",data.message);
+                        }
+                    },
+                    error:function(){
+                        isSave = false;
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        parent.ITSOFT.tools.showMsg("error", "提交失败")
+                    }
+                });
+            }
+        });
+        $("#btn-ok").on('click', function(event) {
+            formatJsonData();
+            $("#addform").submit();
+        });
+        $("#btn-cancel").on('click', function(event) {
+            parent.ITSOFT.itWin.close(index);
+        });
+
+        $('#datagrid').on('click','.chcekFile',function () {
+            var fileUrl = $(this).attr('file-url');
+            var fileName = $(this).attr('file-name');
+            document.cookie = "fileUrl="+fileUrl;
+            document.cookie = "fileName="+fileName;
+            ITSOFT.itWin.open({
+                title:'查看证书',
+                area:['600px','400px'],
+                content:['[[${root}]]/redirect/system/checkQualificationsFiles','no']
+            })
+        })
+    })
+    
+    function formatJsonData() {
+        var cols = '[';
+        $('#datagrid').find('.datagrid-body').find('tr').each(function (i,row) {
+            if (i == 0) {
+                cols += '{';
+            } else {
+                cols += ',{';
+            }
+            cols+='"name":"'+$(row).find('[field=name]').text()+'",';
+            cols+='"number":"'+$(row).find('[field=number]').text()+'",';
+            cols+='"effectiveDate":"'+$(row).find('[field=effectiveDate]').text()+'",';
+            cols+='"address":"'+$(row).find('[field=address]').text()+'",';
+            cols+='"fileUrl":"'+$(row).find('[field=fileUrl]').text()+'",';
+            cols+='"fileName":"'+$(row).find('[field=fileName]').text()+'",';
+            cols+='"picturePath":"'+$(row).find('[field=picturePath]').text()+'"';
+            cols+='}'
+        })
+        cols += ']';
+        $('#qualificationsJsonStr').val(cols);
+    }
+
+    function getRowData() {
+        var row=datagrid.getSelectedRow();
+        console.log(row)
+        var cols='{';
+        cols+='"name":"'+row.find('[field=name]').text()+'",';
+        cols+='"number":"'+row.find('[field=number]').text()+'",';
+        cols+='"effectiveDate":"'+row.find('[field=effectiveDate]').text()+'",';
+        cols+='"address":"'+row.find('[field=address]').text()+'",';
+        cols+='"fileUrl":"'+row.find('[field=fileUrl]').text()+'",';
+        cols+='"fileName":"'+row.find('[field=fileName]').text()+'",';
+        cols+='"picturePath":"'+row.find('[field=picturePath]').text()+'"';
+        cols+='}'
+        cols=JSON.parse(cols)
+        return cols;
+    }
+
+</script>
+</html>

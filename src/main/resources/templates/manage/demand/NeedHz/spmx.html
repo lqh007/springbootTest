@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="datagrid-spmx"></div>
+</body>
+<script>
+    $(function () {
+        var datagridSpmx=$('#datagrid-spmx').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '状态',
+                    field: 'state',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '未上报'
+                    }
+                },
+                {
+                    title: '供应时间',
+                    field: 'GyTime',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-03-01'
+                    }
+                },
+                {
+                    title: '库房',
+                    field: 'wareHouse',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '一号库房'
+                    }
+                },
+                {
+                    title: '原料编码',
+                    field: 'rawBm',
+                    align: "center",
+                    width: '160',
+                    formatter:function () {
+                        return '20180306'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'rawName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '白菜'
+                    }
+                },
+                {
+                    title: '原料单位',
+                    field: 'rawDw',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '斤'
+                    }
+                },
+                {
+                    title: '需求单位',
+                    field: 'XqDw',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '学子食府'
+                    }
+                },
+                {
+                    title: '需求量',
+                    field: 'rawNum',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '10'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return ''
+                    }
+                }
+            ]
+
+        });
+        datagridSpmx.loadData()
+    })
+</script>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>收藏夹</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrapLt{
+            width: 400px;
+            float: left;
+        }
+        .wrapRt{
+            margin-left: 405px;
+        }
+    </style>
+</head>
+<body>
+  <div class="wrap pd-10">
+      <div class="wrap-top">
+          <div style="color: #737373;float: left;">需求计划->需求上报->新建需求单</div>
+          <div id="closeBtn" style="float: right;"></div>
+      </div>
+      <div class="wrap_bd" style="background-color: #fff">
+          <div class="wrapLt">
+            <div class="itsoft-toolbar">
+                <div id="toolBtn"></div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="favorGrid"></div>
+            </div>
+          </div>
+          <div class="wrapRt">
+              <div class="itsoft-toolbar">
+                  <div id="toolBtnRt"></div>
+              </div>
+              <div class="itsoft-datagrid" style="border-top: 0">
+                  <div id="favorGridRt"></div>
+              </div>
+          </div>
+      </div>
+  </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name)
+    var favorGrid,favorGridRt;
+    var loadingindex;
+   $(function () {
+     //关闭按钮
+     $('#closeBtn').toolbarbtn({
+       btn:[
+         {
+           text:'',
+           title:'关闭',
+           width:'35px',
+           icon:'iconfont-close',
+           click:function () {
+             parent.ITSOFT.itWin.close(index);
+           }
+         }
+       ]
+     });
+
+
+      $('#toolBtn').toolbarbtn({
+         btn:[
+           {
+             text:'删除收藏',
+             title:'删除收藏',
+             icon:'iconfont-del2',
+             width:'100px',
+             click:function () {
+                delFavortRow()
+             }
+           }
+         ]
+      });
+      //收藏夹列表
+     favorGrid=$('#favorGrid').datagrid({
+        keyField: "id",
+        page:false,
+        url: '[[${root}]]/api/v2/dining/manage/demandReport/myCollectionsDemandList',
+        type: 'post',
+        line: "both",
+        queryParams:{restaurantId:'[[${restaurantId}]]'},
+        isSequence: false,
+        singleSelect: false,
+        eventrow: false,
+        click: function() {
+            var selectedRow = favorGrid.getSelectedRow();
+            var diningDemandId = favorGrid.getColumn(selectedRow,'id');
+            var queryParams = {};
+            queryParams.diningDemandId = diningDemandId;
+            favorGridRt.refreshData(queryParams);
+        },
+        dblclick: function() {
+
+        },
+        columns:[
+            {
+                field:'id',
+                isshow:false
+            },
+            {
+                title: '收藏标题',
+                field: 'collectionTitle',
+                align: "center",
+                width: '100',
+                widthfix:true,
+                formatter:function () {
+                }
+            },
+            {
+                title: '库房',
+                field: 'warehouseName',
+                align: "center",
+                width: '150',
+                formatter:function () {
+                }
+            }
+        ]
+        });
+
+     favorGrid.loadData()
+
+     //删除
+     function delFavortRow() {
+         //获取选中行
+         var selectedRows = favorGrid.getSelectedRows();
+         if(selectedRows.length == 0) {
+             ITSOFT.tools.showMsg("error", "请选择要删除的行");
+             return false;
+         }
+         var msgtxt = "确定要删除";
+         if(selectedRows.length > 1) {
+             msgtxt += "[选择的" + selectedRows.length + "条数据]吗？";
+         } else {
+             //提示字段要修改
+             msgtxt += "[" + favorGrid.getColumnText(selectedRows[0], "collectionTitle") + "]吗？";
+         }
+         ITSOFT.itWin.confirm(msgtxt, function() {
+             //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+             ITSOFT.dataAjax({
+                 url: '[[${root}]]/api/v2/dining/manage/demandReport/deleteMyCollectionsDemand',
+                 type: 'post',
+                 data: {ids:selectedRows},
+                 async: false,
+                 beforeSend: function () {
+                     loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                 },
+                 success: function (data) {
+                     ITSOFT.itWin.close(loadingindex);
+                     if (data.errorCode == 0) {
+                         ITSOFT.tools.showMsg("ok", "已删除");
+                         $(selectedRows).each(function(i,val) {
+                             //执行成功后删除datagrid数据
+                             favorGrid.deleteRow(val);
+                         });
+                         favorGridRt.refreshData();
+                     } else {
+                         ITSOFT.tools.showMsg("error", data.message);
+                         return false;
+                     }
+                 },
+                 error: function () {
+                     ITSOFT.itWin.close(loadingindex);
+                     ITSOFT.tools.showMsg("error", "删除收藏的需求计划出错");
+                 },
+                 complete: function () {
+                     ITSOFT.itWin.close(loadingindex);
+                 }
+             });
+         });
+     }
+
+    /****详情*****/
+    $('#toolBtnRt').toolbarbtn({
+      btn:[
+        {
+          text:'导入',
+          title:'导入',
+          icon:'iconfont-daoru',
+          click:function () {
+              var selectedRow = favorGrid.getSelectedRow();
+              var diningDemandId = favorGrid.getColumn(selectedRow,'id');
+              if (diningDemandId.length == 0){
+                  ITSOFT.tools.showMsg("error", "请选择要要导入的需求单");
+                  return false;
+              }
+              ITSOFT.itWin.confirm("确定导入选择的需求单吗？", function() {
+                  parent.window.location.href = '[[${root}]]/redirect/demand/addDemandReport?id=' + diningDemandId+'&type=report';
+                  parent.ITSOFT.itWin.close(index);
+              });
+
+          }
+        }
+      ]
+    });
+     //详情列表
+     favorGridRt=$('#favorGridRt').datagrid({
+       keyField: "id",
+       page:false,
+       url: '[[${root}]]/api/v2/dining/manage/demandReport/diningDemandDetailsList',
+       type: 'post',
+       line: "both",
+       isSequence: true,
+       singleSelect:true,
+       eventrow: false,
+       click: function() {
+
+       },
+       dblclick: function() {
+
+       },
+       columns:[
+         {
+           field:'id',
+           isshow:false
+         },
+         {
+           title: '编码',
+           field: 'materialCode',
+           align: "center",
+           width: '80',
+           widthfix:true,
+           formatter:function () {
+           }
+         },
+         {
+           title: '原料名称',
+           field: 'materialName',
+           align: "center",
+           width: '100',
+           formatter:function () {
+           }
+         },
+         {
+           title: '原料类别',
+           field: 'materialTypeName',
+           align: "center",
+           width: '100',
+           formatter:function () {
+           }
+         },
+         {
+           title: '规格',
+           field: 'materialModule',
+           align: "center",
+           width: '100',
+           formatter:function () {
+           }
+         },
+         {
+           title: '单位',
+           field: 'materialUnit',
+           align: "center",
+           width: '80',
+           formatter:function () {
+           }
+         },
+         {
+           title: '品牌',
+           field: 'materialBrand',
+           align: "center",
+           width: '150',
+           formatter:function () {
+           }
+         },
+         {
+           title: '需求量',
+           field: 'number',
+           align: "center",
+           width: '100',
+           formatter:function () {
+           }
+         },
+         {
+           title: '备注',
+           field: 'remark',
+           align: "center",
+           width: '150',
+           widthfix:true,
+           formatter:function () {
+           }
+         }
+       ]
+     });
+
+   })
+</script>
+</html>

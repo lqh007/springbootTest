@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>选择原料</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .itsoftLt{
+            width: 200px;
+            float: left;
+        }
+        .itsoftRt{
+            margin-left: 205px;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10">
+       <div class="itsoftLt">
+            <div class="itsoft-tree" id="selectTree"></div>
+       </div>
+       <div class="itsoftRt">
+           <div class="itsoft-toolbar">
+               <div id="toolSearch" style="float: left"></div>
+               <div id="toolBtn" style="float: right"></div>
+           </div>
+           <div  id="datgrid" style="border-top:0 ; float: right; "> </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var datagrid;
+    var index=parent.layer.getFrameIndex(window.name);
+    var typeName = '';
+    $(function () {
+        var tree = $("#selectTree").itsofttree({
+            url: "[[${root}]]/api/v2/dining/manage/diningMaterialType/diningMaterialTypeTreeList",
+            type: "post",
+            root: ['root','所有类型'], //根节点 如['root','根节点']
+            height: "100%",
+            isOpen:true,
+            click: function(val, text) {
+                if (typeName != val) {
+                    typeName = val;
+                    var queryParams = {};
+                    queryParams.materialTypeId = val;
+                    datagrid.refreshData(queryParams);
+                }
+            }
+        });
+
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'编码/拼音码/名称',
+            searchEvent:function (val) {
+                var queryParams = {searchValue:val};
+               datagrid.refreshData(queryParams)
+            }
+        });
+        //按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[{
+                text:'确定',
+                title:'确定',
+                icon:'iconfont-add',
+                click:function () {
+                    addRow()
+                }
+            },{
+                text:'取消',
+                title:'取消',
+                icon:'iconfont-del2',
+                click:function () {
+                   closeRow()
+                }
+            }]
+        });
+
+     datagrid = $('#datgrid').datagrid({
+            keyField: "id",
+            page:true,
+            url: '[[${root}]]/api/v2/dining/manage/diningMaterial/materialSelectTable',
+            type: 'post',
+            line: "both",
+            queryParams:{warehouseId:'[[${warehouseId}]]'},
+            isSequence: false,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '编码',
+                    field: 'number',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '名称',
+                    field: 'name',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'specification',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'unit',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'brand',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '条码',
+                    field: 'barCode',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '拼音码',
+                    field: 'spell',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '类别',
+                    field: 'typeName',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                    }
+                },
+                {
+                    title: '保质期',
+                    field: 'warranty',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '150',
+                    formatter:function (row,i,o) {
+                    }
+                }
+            ]
+        });
+        datagrid.loadData(0);
+
+
+        //点击确定
+        function addRow() {
+            var rows=datagrid.getSelectedRows();
+            if(rows.length==0){
+                parent.ITSOFT.tools.showMsg('error','请选择要添加的行');
+                return false
+            }
+            parent.ITSOFT.dataAjax({
+                url: '[[${root}]]/api/v2/dining/manage/diningWarehouseMaterial/saveWarehouseMaterial',
+                type: 'post',
+                data: {ids:rows,warehouseId:'[[${warehouseId}]]'},
+                async: false,
+                beforeSend: function () {
+                    loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+                },
+                success: function (data) {
+                    parent.ITSOFT.itWin.close(loadingindex);
+                    if (data.errorCode == 0) {
+                        parent.ITSOFT.tools.showMsg("ok", data.message);
+                        parent.datagrid.refreshData();
+                        parent.ITSOFT.itWin.close(index);
+                    } else {
+                        parent.ITSOFT.tools.showMsg("error", data.message);
+                        return false;
+                    }
+                },
+                error: function () {
+                    parent.ITSOFT.itWin.close(loadingindex);
+                    parent.ITSOFT.tools.showMsg("error", data.message);
+                },
+                complete: function () {
+                    parent.ITSOFT.itWin.close(loadingindex);
+                }
+            });
+
+
+        }
+
+        //关闭页面
+        function closeRow() {
+            parent.ITSOFT.itWin.close(index)
+        }
+
+
+
+    });
+</script>
+</html>

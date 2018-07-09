@@ -1,0 +1,43 @@
+@charset "utf-8";
+/* CSS Document */
+*{margin: 0px;padding: 0px;}
+body{backgroud-size:100%; color: #666666;font-family: "microsoft yahei",verdana;}
+.main {
+	background: url(../img/login/bg.png);
+	background-color: #f6f6f6;
+    position: fixed;
+    _position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    min-width: 1000px;
+    z-index: -10;
+    background-position: center 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    zoom: 1;
+}
+.dialogDiv{margin-top: -210px;margin-left: -250px;padding-top:40px ; position: absolute;left: 50%;top: 50%; text-align: center; width: 500px;height: 440px;background-color:rgba(255,255,255,0.5);border-radius: 3px;}
+h4{font-size: 20px;letter-spacing: 1.5px;margin: 10px auto;font-weight:600;}
+.form-horizontal{width: 70%;margin: 25px auto;}
+.form-horizontal .form-group{margin: 18px 0px;background-color: white;height: 36px;line-height: 36px; border-radius: 3px;}
+.zhbg{background: url(../img/login/yh.png) no-repeat 0px 2px;background-size: 13px;line-height: 20px;}
+.mmbg{background: url(../img/login/mima.png) no-repeat 0px 10px;background-size: 13px;}
+.form-control{display: inline-block;width: 270px;padding: 0;border: 0px solid white;box-shadow: none;height: 22px;}
+.form-control:focus{box-shadow: 0 0px 0px rgba(0,0,0,0.075);}
+.formgroupfocus{border-color: #66AFE9;box-shadow: 1px 1px 1px rgba(0,0,0,0.075) inset,0 0 8px rgba(102,175,233,0.6);outline: 0 none;}
+.yz{width: 130px;margin-right: 15px;}
+label{font-weight: normal;}
+.form-horizontal .control-label{width: 60px;padding: 0px;text-align: left;padding-left:18px ;}
+.lg{width: 100%;color: #333;background-color: #35b4be !important;border-color:#35b4be !important;}
+p{margin-top: 7px;font-size: 12px;}
+p a{color: #333;}
+.a1{position: relative;float: left;}
+.a2{position: relative;float: right;}
+
+.tiper{text-align: right;color: red;margin: -11px auto;display: none;}
+.bb{margin: 18px auto 0px auto;}
+.logHid{display: none;}

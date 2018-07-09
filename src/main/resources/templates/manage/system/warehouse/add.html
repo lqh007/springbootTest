@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+        .control-label{
+            width: 100px;
+        }
+        .tip{
+            color: red;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10" style="margin-left: 15px">
+       <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningWarehouse/insertOrUpdateDiningWarehouse'}" method="post" th:object="${diningWarehouse}">
+           <input type="hidden" name="id" th:value="${diningWarehouse.id}">
+           <div class="form-group row">
+               <label class="control-label"><i class="tip">*</i>库房名称：</label>
+               <div style="width: 280px">
+                   <input type="text" name="name" th:value="${diningWarehouse.name}" class="form-control">
+               </div>
+               <label class="control-label">简&nbsp;&nbsp;&nbsp;称：</label>
+               <div style="width: 280px">
+                   <input type="text" name="number" th:value="${diningWarehouse.number}" placeholder="用于排序或者检索，可以为空" class="form-control">
+               </div>
+           </div>
+           <div class="form-group row">
+               <label class="control-label"><i class="tip">*</i>类&nbsp;&nbsp;&nbsp;型：</label>
+               <div style="width: 280px">
+                   <div class="dropdownlist" id="warehouseTypeSelect" name="warehouseTypeSelect"></div>
+               </div>
+               <input type="hidden" id="typeId" name="typeId" th:value="${diningWarehouse.typeId}">
+               <input type="hidden" id="typeName" name="typeName" th:value="${diningWarehouse.typeName}">
+               <label class="control-label"><i class="tip">*</i>加价比例：</label>
+               <div style="width: 280px">
+                   <input type="text" name="priceIncreaseRatio" th:value="${diningWarehouse.priceIncreaseRatio}" class="form-control">
+               </div>
+           </div>
+           <div class="form-group row">
+               <label class="control-label"><i class="tip">*</i>负责人：</label>
+               <div style="width: 280px">
+                   <input type="text" name="personName" th:value="${diningWarehouse.personName}" class="form-control">
+               </div>
+               <label class="control-label"><i class="tip">*</i>联系电话：</label>
+               <div style="width: 280px;position: relative">
+                   <input type="number" name="contactNumber" th:value="${diningWarehouse.contactNumber}" class="form-control">
+               </div>
+           </div>
+           <div class="form-group row">
+               <label class="control-label">计划价：</label>
+               <div style="width: 280px;margin-top: 5px">
+                   <div class="check-box">
+                       <input type="checkbox" id="checkbox" value="1" name="plannedPrice" th:checked="${diningWarehouse.plannedPrice} eq '1'">
+                       <label for="checkbox"></label>
+                   </div>
+               </div>
+               <label class="control-label"><i class="tip">*</i>汇总方式：</label>
+               <div style="width: 280px">
+                   <div class="dropdownlist" id="summaryTypeSelect" name="summaryTypeSelect"></div>
+               </div>
+               <input type="hidden" id="summaryName" name="summaryName" th:value="${diningWarehouse.summaryName}">
+               <input type="hidden" id="summaryId" name="summaryId" th:value="${diningWarehouse.summaryId}">
+           </div>
+           <div class="form-group row">
+               <label class="control-label">备&nbsp;&nbsp;&nbsp;注：</label>
+               <div style="width: 660px">
+                   <textarea type="text" name="remarks"  class="form-control" style="height: 120px" th:text="${diningWarehouse.remarks}"></textarea>
+               </div>
+           </div>
+       </form>
+       <div class="btnBox">
+           <div>
+               <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+               <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+           </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js"  th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var isSave = false;
+    var loadingindex;
+    $(function () {
+        $('.check-box input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+
+        //库房类型
+         $('#warehouseTypeSelect').dropdownlist({
+             data:[{'id':'1','text':'采购库'},{'id':'2','text':'加工库'}],
+             // dataurl:'../../../../../../data/select.json',
+             // type: "GET",
+             placeholder: "请选择类型",
+             selectValue: '[[${diningWarehouse.typeId}]]', //选中的值
+             selectText: '[[${diningWarehouse.typeName}]]', //选中的值
+             width:'278px',
+             changeEvent:function (val,text) {
+                $('#typeId').val(val);
+                $('#typeName').val(text);
+             }
+         });
+
+        //汇总类型
+        $('#summaryTypeSelect').dropdownlist({
+            data:[{'id':'1','text':'餐厅班组汇总'},{'id':'2','text':'原料单品汇总'}],
+            // dataurl:'../../../../../../data/select.json',
+            // type: "GET",
+            placeholder: "请选择类型",
+            selectValue: '[[${diningWarehouse.summaryId}]]', //选中的值
+            selectText: '[[${diningWarehouse.summaryName}]]', //选中的值
+            width:'278px',
+            changeEvent:function (val,text) {
+                $('#summaryId').val(val);
+                $('#summaryName').val(text);
+            }
+        });
+        //验证
+        $("#addform").validate({
+            rules: {
+                name: {
+                    required: true
+                },
+                warehouseTypeSelecttext: {
+                    required: true
+                },
+                personName: {
+                    required: true
+                },
+                contactNumber: {
+                    required: true,
+                    isTel:true
+                },
+                priceIncreaseRatio: {
+                    required: true,
+                    isIntGteZero:true
+                },
+                summaryType: {
+                    required: true
+                },
+                summaryTypeSelecttext:{
+                    required: true
+                }
+            },
+            messages: {
+                contactNumber: {
+                    isTel:"请输入正确的电话号码"
+                },
+                priceIncreaseRatio: {
+                    isIntGteZero:"请输入大于等于0的整数"
+                }
+            },
+            onkeyup: false,
+            focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+            success: "valid",
+            submitHandler: function(form) {
+                $(form).ajaxSubmit({
+                    beforeSend: function () {
+                        if (isSave) {
+                            parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                            return false;
+                        }
+                        isSave = true;
+                        loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success:function(data){
+                        //提交成功后
+                        isSave = false;
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        if(data.errorCode==0){
+                            if(data.data.type == "add"){
+                                parent.datagrid.insertRow(data.data.obj);
+                                parent.ITSOFT.tools.showMsg("ok",data.message);
+                                $('#checkbox').iCheck('uncheck');
+                                $('#checkbox').parent('.icheckbox-blue').removeClass('checked');
+                                document.getElementById("addform").reset();
+                            }else {
+                                parent.datagrid.editRow(data.data.obj);
+                                parent.ITSOFT.tools.showMsg("ok",data.message);
+                                parent.ITSOFT.itWin.close(index);
+                            }
+                        }else{
+                            parent.ITSOFT.tools.showMsg("error",data.message);
+                        }
+                    },
+                    error:function(){
+                        isSave = false;
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        parent.ITSOFT.tools.showMsg("error", "提交失败")
+                    }
+                });
+            }
+        });
+        $("#btn-ok").on('click', function(event) {
+            $("#addform").submit();
+        });
+        $("#btn-cancel").on('click', function(event) {
+            parent.ITSOFT.itWin.close(index)
+        });
+
+    });
+</script>
+</html>

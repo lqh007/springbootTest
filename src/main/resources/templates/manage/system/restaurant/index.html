@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>餐厅管理</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrap {
+            height: 100%;
+            background-color: #f2f2f2;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .dropdownlist {
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+
+        .wrapLt {
+            float: left;
+            width: 520px;
+        }
+
+        .wrapRt {
+            margin-left: 525px;
+        }
+
+        .typeName {
+            line-height: 45px;
+            font-weight: 700;
+            float: left;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">系统管理->餐厅管理</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd" style="background-color: #fff">
+        <div class="itsoft-panel">
+            <!--班组-->
+            <div class="wrapLt">
+                <div class="itsoft-toolbar">
+                    <div class="typeName">餐厅</div>
+                    <div id="toolDining" style="float: right"></div>
+                </div>
+                <div class="itsoft-datagrid" id="lDatagrid" style="border-top: 0"></div>
+            </div>
+            <!--卡机-->
+            <div class="wrapRt">
+                <div class="itsoft-toolbar">
+                    <div class="typeName">班组</div>
+                    <div id="toolCardBtn" style="float: right"></div>
+                </div>
+                <div class="itsoft-datagrid" id="rDatagrid" style="border-top: 0"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var lDatagrid, rDatagrid;
+    var index = parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '',
+                    title: '关闭',
+                    width: '35px',
+                    icon: 'iconfont-close',
+                    click: function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅按钮
+        $('#toolDining').toolbarbtn({
+            btn: [
+                {
+                    text: '添加',
+                    title: '添加',
+                    icon: 'iconfont-add',
+                    click: function () {
+                        addRowCt()
+                    }
+                },
+                {
+                    text: '编辑',
+                    title: '编辑',
+                    icon: 'iconfont-edit',
+                    click: function () {
+                        editRowCt()
+                    }
+                },
+                {
+                    text: '删除',
+                    title: '删除',
+                    icon: 'iconfont-del2',
+                    click: function () {
+                        delRowCt()
+                    }
+                },
+            ]
+        })
+        //餐厅列表
+        lDatagrid = $('#lDatagrid').datagrid({
+            keyField: "id",
+            page: false,
+            url: '[[${root}]]/api/v2/dining/manage/diningRestaurant/diningRestaurantList',
+            type: 'post',
+            line: "both",
+            isSequence: false,
+            singleSelect: false,
+            eventrow: false,
+            click: function () {
+                var selectedRow = lDatagrid.getSelectedRow();
+                var id = lDatagrid.getColumn(selectedRow,'id');
+                var queryParams = {restaurantId:id};
+                rDatagrid.refreshData(queryParams);
+            },
+            dblclick: function () {
+                editRowCt()
+            },
+            loadend: function (queryParams) {
+                lDatagrid.iCheck()
+            },
+            columns: [
+                {
+                    field: 'id',
+                    isshow: false
+                },
+                {
+                    title: '排序号',
+                    field: 'number',
+                    align: "center",
+                    width: '60',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '餐厅名称',
+                    field: 'name',
+                    align: "left",
+                    width: '100',
+                    widthfix: true,
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '拼音码',
+                    field: 'spell',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '责任人',
+                    field: 'person',
+                    align: "center",
+                    width: '90',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '联系电话',
+                    field: 'contactNumber',
+                    align: "left",
+                    width: '130',
+                    formatter: function () {
+                    }
+                },
+            ]
+        });
+
+        lDatagrid.loadData(0);
+
+        //添加餐厅
+        function addRowCt() {
+            ITSOFT.itWin.open({
+                title: '添加',
+                area: ['780px', '600px'],
+                content: ['[[${root}]]/redirect/system/addRestaurant', 'no']
+            })
+        }
+
+        //编辑餐厅
+        function editRowCt() {
+            var selectedRow = lDatagrid.getSelectedRow();
+            var id = lDatagrid.getColumn(selectedRow,'id');
+            if(id.length == 0){
+                ITSOFT.tools.showMsg("error","请选择要编辑的行");
+                return false;
+            }
+            ITSOFT.itWin.open({
+                title: '编辑',
+                area: ['780px', '600px'],
+                content: ['[[${root}]]/redirect/system/addRestaurant?id='+id, 'no']
+            })
+        }
+
+        //删除餐厅
+        function delRowCt() {
+            //获取选中行
+            var selectedRows = lDatagrid.getSelectedRows();
+            if(selectedRows.length == 0) {
+                ITSOFT.tools.showMsg("error", "请选择要删除的行");
+                return false;
+            }
+            var msgtxt = "确定要删除";
+            if(selectedRows.length > 1) {
+                msgtxt += "[选择的" + selectedRows.length + "条数据]吗？";
+            } else {
+                //提示字段要修改
+                msgtxt += "[" + lDatagrid.getColumnText(selectedRows[0], "name") + "]吗？";
+            }
+            ITSOFT.itWin.confirm(msgtxt, function() {
+                //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningRestaurant/deleteDiningRestaurant',
+                    type: 'post',
+                    data: {ids:selectedRows},
+                    async: false,
+                    beforeSend: function () {
+                        loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success: function (data) {
+                        ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            ITSOFT.tools.showMsg("ok", "已删除");
+                            $(selectedRows).each(function(i,val) {
+                                //执行成功后删除datagrid数据
+                                lDatagrid.deleteRow(val);
+                            });
+                            rDatagrid.refreshData();
+                        } else {
+                            ITSOFT.tools.showMsg("error", data.message);
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                        ITSOFT.tools.showMsg("error", "删除餐厅异常");
+                    },
+                    complete: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                    }
+                });
+            });
+        }
+
+        /***
+         *   班组
+         * ***/
+
+        $('#toolCardBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '添加',
+                    title: '添加',
+                    icon: 'iconfont-add',
+                    click: function () {
+                        addRow()
+                    }
+                }, {
+                    text: '编辑',
+                    title: '编辑',
+                    icon: 'iconfont-edit',
+                    click: function () {
+                        editRow()
+                    }
+                }, {
+                    text: '删除',
+                    title: '删除',
+                    icon: 'iconfont-del2',
+                    click: function () {
+                        delRows()
+                    }
+                }
+            ]
+        });
+        //班组列表
+        rDatagrid = $('#rDatagrid').datagrid({
+            keyField: "id",
+            page: false,
+            url: '[[${root}]]/api/v2/dining/manage/diningRestaurantTeam/diningRestaurantTeamList',
+            type: 'post',
+            line: "both",
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function () {
+
+            },
+            dblclick: function () {
+                editRow()
+            },
+            loadend: function (queryParams) {
+                rDatagrid.iCheck()
+            },
+            columns: [
+                {
+                    field: 'id',
+                    isshow: false
+                },{
+                    title: '班组名称',
+                    field: 'teamName',
+                    align: "left",
+                    width: '120',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '简称',
+                    field: 'abbreviation',
+                    align: "center",
+                    width: '90',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '计划价',
+                    field: 'plannedPrice',
+                    align: "center",
+                    width: '80',
+                    formatter: function (v,i,r) {
+                        if (v == '1'){
+                            return '是';
+                        }else{
+                            return '否';
+                        }
+                    }
+                },
+                {
+                    title: '核算',
+                    field: 'accounting',
+                    align: "center",
+                    width: '80',
+                    formatter: function (v,i,r) {
+                        if (v == '1'){
+                            return '是';
+                        }else{
+                            return '否';
+                        }
+                    }
+                },
+                {
+                    title: '分组方式',
+                    field: 'groupingName',
+                    align: "center",
+                    width: '120',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '联系人',
+                    field: 'person',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '联系电话',
+                    field: 'contactNumber',
+                    align: "center",
+                    width: '130',
+                    widthfix: true,
+                    formatter: function () {
+                    }
+                }
+            ]
+        });
+
+        //添加班组
+        function addRow() {
+            var selectedRow = lDatagrid.getSelectedRow();
+            var restaurantId = lDatagrid.getColumn(selectedRow,'id');
+            var restaurantName = lDatagrid.getColumn(selectedRow,'name');
+            if(restaurantId.length == 0){
+                ITSOFT.tools.showMsg("error","请选择餐厅");
+                return false;
+            }
+            ITSOFT.itWin.open({
+                title: '添加班组',
+                area: ['650px', '550px'],
+                content: ['[[${root}]]/redirect/system/addRestaurantTeam?restaurantId='+restaurantId+'&restaurantName='+restaurantName]
+            })
+        }
+
+        //编辑班组
+        function editRow() {
+            var selectedRow = rDatagrid.getSelectedRow();
+            var id = rDatagrid.getColumn(selectedRow,'id');
+            if(id.length == 0){
+                ITSOFT.tools.showMsg("error","请选择班组");
+                return false;
+            }
+            ITSOFT.itWin.open({
+                title: '编辑班组',
+                area: ['650px', '550px'],
+                content: ['[[${root}]]/redirect/system/addRestaurantTeam?id='+id]
+            })
+        }
+
+        //删除班组
+        function delRows() {
+            //获取选中行
+            var selectedRows = rDatagrid.getSelectedRows();
+            if(selectedRows.length == 0) {
+                ITSOFT.tools.showMsg("error", "请选择要删除的行");
+                return false;
+            }
+            var msgtxt = "确定要删除";
+            if(selectedRows.length > 1) {
+                msgtxt += "[选择的" + selectedRows.length + "条数据]吗？";
+            } else {
+                //提示字段要修改
+                msgtxt += "[" + rDatagrid.getColumnText(selectedRows[0], "teamName") + "]吗？";
+            }
+            ITSOFT.itWin.confirm(msgtxt, function() {
+                //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningRestaurantTeam/deleteDiningRestaurantTeam',
+                    type: 'post',
+                    data: {ids:selectedRows},
+                    async: false,
+                    beforeSend: function () {
+                        loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success: function (data) {
+                        ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            ITSOFT.tools.showMsg("ok", "已删除");
+                            $(selectedRows).each(function(i,val) {
+                                //执行成功后删除datagrid数据
+                                rDatagrid.deleteRow(val);
+                            });
+                        } else {
+                            ITSOFT.tools.showMsg("error", data.message);
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                        ITSOFT.tools.showMsg("error", "删除班组异常");
+                    },
+                    complete: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                    }
+                });
+            });
+        }
+
+    })
+</script>
+</html>

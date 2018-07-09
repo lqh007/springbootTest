@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>新建需求上单</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" type="text/css" href="../../../../static/itsoftui/plugins/pikaday/pikaday.css" th:href="@{${root}+'/itsoftui/plugins/pikaday/pikaday.css'}"/>
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .timeBtn span{
+            margin-top: 0;
+        }
+        .table-search-menu{
+            width: 660px!important;
+        }
+        .tip{
+            color: #aa1111;
+        }
+        .actionBtn{
+            float: left;
+            margin-top: 5px;
+        }
+        .actionBtn .action{
+           width: 120px;
+           height: 30px;
+           text-align: center;
+           line-height: 30px;
+           display: inline-block;
+           background-color: #edf6ff;
+           cursor: pointer;
+           margin-right: 10px;
+
+        }
+        .actionBtn span{
+            color: #2e8ded;
+        }
+        .itemBtn{
+            float: right;
+            margin-top: 5px;
+        }
+        .itemBtn .item{
+            display: inline-block;
+            width: 100px;
+            height: 30px;
+            border-radius: 3px;
+            text-align: center;
+            line-height: 30px;
+            background-color:#edf6ff;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .itemOn{
+            background-color: #2e8ded!important;
+        }
+        .delBtn{
+            color: red;
+            cursor: pointer;
+        }
+        .selectrow .delBtn{
+            color: #fff;
+        }
+        .orderlog{
+            position: absolute;
+            height: 145px;
+            overflow: auto;
+            right: 2px;
+            line-height: 25px;
+            top: 0px;
+            width: 395px;
+        }
+        .line-row{
+            margin:15px 0;
+            position: relative;
+        }
+        .cause{
+            min-width: 190px;
+            vertical-align: top;
+            display: inline-block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        .line{
+            width: 2px;
+            background-color: #2e8ded;
+            position: absolute;
+            top:18px;
+            left:129px;
+            height: 27px;
+            z-index: 6666;
+        }
+        .stateName{
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: #e8e8e8;
+            position: absolute;
+            top: 15px;
+            right: 750px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <div style="color: #737373;float: left;">需求计划->需求上报->新建需求单</div>
+        <div id="closeBtn" style="float: right;"></div>
+    </div>
+    <div class="wrap-bd" style="height: 95%">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar" th:object="${diningDemand}">
+                <div class="actionBtn">
+                    <div class="action" id="addNewBtn">
+                        <img src="../../../../static/common/images/xin.png" th:src="@{${root}+'/common/images/xin.png'}">
+                        <span>新建需求单</span>
+                    </div>
+                    <div class="action" id="folderBtn">
+                        <img src="../../../../static/common/images/d2.png" th:src="@{${root}+'/common/images/d2.png'}">
+                        <span>从收藏夹导入</span>
+                    </div>
+                </div>
+                <div class="itemBtn">
+                  <div class="item itemOn" id="saveBtn">
+                      <img src="../../../../static/common/images/d3.png" th:src="@{${root}+'/common/images/d3.png'}">
+                      <span style="color: #edf6fb">保存(F9)</span>
+                  </div>
+                  <div class="item" id="reportBtn">
+                      <img src="../../../../static/common/images/d4.png" th:src="@{${root}+'/common/images/d4.png'}">
+                      <span style="color:#2e8ded;">上报(F10)</span>
+                  </div>
+                  <div class="item" id="delBtn" th:if="${type ne 'report' && diningDemand.id != null && diningDemand.id ne ''} ">
+                      <img src="../../../../static/common/images/d5.png" th:src="@{${root}+'/common/images/d5.png'}">
+                      <span style="color: #fb9c40">删除</span>
+                  </div>
+                </div>
+            </div>
+            <div class="itsoft-panel-form">
+                <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/demandReport/insertOrUpdateDiningDemand'}" method="post" th:object="${diningDemand}">
+                    <input type="hidden" id="id" name="id" th:if="${type} ne 'report'" th:value="${diningDemand.id}">
+                    <input type="hidden" id="status" name="status">
+                    <input type="hidden" id="warehouseId" name="warehouseId" th:value="${diningDemand.warehouseId}">
+                    <input type="hidden" id="warehouseName" name="warehouseName" th:value="${diningDemand.warehouseName}">
+                    <input type="hidden" id="requirementUnitId" name="requirementUnitId" th:value="${diningDemand.requirementUnitId}">
+                    <input type="hidden" id="requirementUnitName" name="requirementUnitName" th:value="${diningDemand.requirementUnitName}">
+                    <input type="hidden" id="demandDetailJsonStr" name="demandDetailJsonStr">
+                    <input type="hidden" id="isCollection" name="isCollection" value="0">
+                    <input type="hidden" id="collectionTitle" name="collectionTitle">
+                    <div class="row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;">单据号：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <input type="text" name="gysname" placeholder="单据号自动生成" disabled="disabled" th:if="${type} eq 'report'" class="form-control">
+                            <input type="text" name="gysname" placeholder="单据号自动生成" disabled="disabled" th:if="${type} ne 'report'" th:value="${diningDemand.orderNumber}" class="form-control">
+                        </div>
+                        <label class="col-md-1 control-label" style="width: 90px;"><em class="tip">*</em>供应时间：</label>
+                        <div class="col-md-1" style="width: 385px;">
+                            <div class="timeBtn btnop" style="float: left">
+                                <span class="yj3" data="1">今天</span>
+                                <span class="yj3 on" data="2">明天</span>
+                                <span class="yj3" data="3">后天</span>
+                            </div>
+                            <div style="width: 200px;float: left">
+                                <input type="text" id="supplyTimeValue" name="supplyTimeValue" th:if="${type} eq 'report'" placeholder="请选择供应时间" class="form-control">
+                                <input type="text" id="supplyTimeValue" name="supplyTimeValue" th:if="${type} ne 'report'" th:value="${#dates.format(diningDemand.supplyTime,'yyyy-MM-dd')}" placeholder="请选择供应时间" class="form-control">
+                                <i class="iconfont iconfont-arrow2-bottom" style=" float:right; position: absolute; top:2px;right:20px"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;"><em class="tip">*</em>库房：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <div id="wareHouse" class="dropdownlist" name="wareHouse">
+                            </div>
+                        </div>
+                        <label class=" col-md-1  control-label" style="width: 90px;"><em class="tip">*</em>需求单位：</label>
+                        <div class="col-md-1 " style="width: 367px;">
+                            <div id="demandUnit" class="dropdownlist" name="demandUnit">
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;">备注：</label>
+                        <div class="col-md-1 " style="width: 673px;">
+                            <input type="text" name="remark" placeholder="备注信息" th:value="${diningDemand.remark}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="stateName" th:if="${type ne 'report' && diningDemand.status eq '3'}">
+                        驳回
+                    </div>
+                </form>
+                <div id="orderlog" style="position: absolute; height: 145px; overflow: auto; right: 2px;
+            line-height: 25px; top: 0px; width: 320px;" th:unless="${type ne 'report' && diningDemand.status eq '3'}">
+                    <p style="margin-top: 5px;">
+                        <code>温馨提示:</code></p>
+                    <p>
+                        1.录入明细前请先选择库房;</p>
+                    <p>
+                        2.带<em style="color: red">*</em>号项目为必填项目;</p>
+                    <p>
+                        3.供应时间为要求库房供应的时间；</p>
+                    <p>
+                        4.上报=保存+上报，需求上报后将不能修改。</p>
+                </div>
+                <div id="orderlog" class="orderlog" th:if="${type ne 'report' && diningDemand.status eq '3'}">
+                    <div class="line-box">
+                        <div class="line-row">
+                            <span>2018-02-01 10:10</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                        <div class="line-row">
+                            <span>2018-02-06 09:20</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/moment.min.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/moment.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/pikaday/pikaday.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/pikaday/pikaday.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    var warehouseId = '[[${diningDemand.warehouseId}]]';
+    var selectedMaterial = '';
+    var loadingindex;
+    $(function () {
+        var restaurantId = parent.restaurantId;
+        var restaurantName = parent.restaurantName;
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+
+        //库房下拉
+        var warehouseSel = $('#wareHouse').dropdownlist({
+            type:'post',
+            dataurl:'[[${root}]]/api/v2/dining/manage/diningWarehouse/diningWarehouseRolesSelect',
+            placeholder:'请选择库房',
+            width:'182px',
+            selectValue: "[[${diningDemand.warehouseId}]]", //选中的值
+            selectText: "[[${diningDemand.warehouseName}]]", //选中的值
+            // autoLoad:true,
+            changeEvent:function (val,text) {
+                warehouseId = val;
+                $('#warehouseId').val(val);
+                $('#warehouseName').val(text);
+                addrow()
+            }
+        });
+
+        //需求单位
+        var demandUnitSel = $('#demandUnit').dropdownlist({
+            type:'post',
+            dataurl:'[[${root}]]/api/v2/dining/manage/diningRestaurantTeam/diningRestaurantTeamRolesSelect',
+            placeholder:'请选择需求单位',
+            selectValue: "[[${diningDemand.requirementUnitId}]]", //选中的值
+            selectText: "[[${diningDemand.requirementUnitName}]]", //选中的值
+            queryParams:{restaurantId:restaurantId},
+            width:'365px',
+            changeEvent:function (val,text) {
+                $('#requirementUnitId').val(val);
+                $('#requirementUnitName').val(text);
+            }
+        });
+        //收藏夹导入
+       $('#folderBtn').on('click',function () {
+           favoriteRows()
+       });
+        
+        $(document).on('keydown',function (e) {
+            var key=e.keyCode;
+            if(key==120){
+                saveRow()
+            }
+            if(key==121){
+                saveUpRow()
+            }
+        })
+        //新建
+       $('#addNewBtn').on('click',function () {
+           addNew()
+       });
+        //保存
+        $('#saveBtn').on('click',function () {
+         saveRow()
+       });
+        //上报
+       $('#reportBtn').on('click',function () {
+         saveUpRow()
+       });
+        //删除
+       $('#delBtn').on('click',function () {
+         delReport()
+       });
+
+       //供应时间
+        $('.timeBtn').on('click','span',function () {
+           $(this).addClass('on').siblings().removeClass('on');
+           var d=$(this).attr('data');
+           getRowTime(d)
+        });
+        var pickerydrq = new Pikaday({
+            field: document.getElementById('supplyTimeValue'),
+            firstDay: 1,
+            format: 'YYYY-MM-DD',
+            minDate: ITSOFT.tools.dateCalDay(1, 0), //today
+            maxDate: ITSOFT.tools.dateCalDay(1, 30), //30days  后
+            yearRange: [2010, 2020]
+        });
+       //列表
+      datagrid = $('#datagrid').datagrid({
+            keyField: "id",
+            page:false,
+            url: '[[${root}]]/api/v2/dining/manage/demandReport/diningDemandDetailsList',
+            type: 'post',
+            queryParams:{diningDemandId:'[[${diningDemand.id}]]'},
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            sumRow:"合计",
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            loadend:function(){
+                getAllPrice();
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                }, {
+                    field:'materialId',
+                    isshow:false
+                }, {
+                    field:'materialTypeId',
+                    isshow:false
+                },{
+                    title: '<img src="[[${root}]]/common/images/xinzeng.png"  class="listbtn addrow" style="height: auto;width: auto;top: 8px;right:17px">',
+                    width: '50',
+                    align:'center',
+                    formatter:function () {
+                        return '<span class="iconfont iconfont-del2 delBtn" style="font-size: 20px"></span>'
+                    }
+                },{
+                    title: '编码',
+                    field: 'materialCode',
+                    align: "center",
+                    width: '120',
+                    formatter:function (val) {
+                        return '<input type="text" value="'+val+'" name="coding">'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'materialName',
+                    align: "center",
+                    width: '180',
+                    overflow: "visible",
+                    formatter:function (val) {
+                        return '<input type="text" name="rawName" data=""  value="'+val+'">' +
+                               '<a class="iconfont listbtn iconfont-more"></a>' +
+                               '<div class="table-search-menu"></div>';
+                    }
+                },
+                {
+                    title: '原料类别',
+                    field: 'materialTypeName',
+                    align: "center",
+                    width: '150',
+                    formatter:function (val) {
+                        return '<span>'+val+'</span>'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'materialModule',
+                    align: "center",
+                    width: '100',
+                    formatter:function (val) {
+                        return '<span>'+val+'</span>'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'materialUnit',
+                    align: "center",
+                    width: '80',
+                    formatter:function (val) {
+                        return '<span>'+val+'</span>'
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'materialBrand',
+                    align: "center",
+                    width: '150',
+                    formatter:function (val) {
+                        return '<span>'+val+'</span>'
+                    }
+                },
+                {
+                    title: '需求量',
+                    field: 'number',
+                    align: "center",
+                    width: '100',
+                    formatter:function (val) {
+                        return '<input name="number" type="text" value="'+val+'">'
+                    }
+                },{
+                    title: '供应价',
+                    field: 'price',
+                    align: "center",
+                    width: '80',
+                    formatter:function (val) {
+                        return '<span>'+val+'</span>'
+                    }
+                },{
+                    title: '金额',
+                    field: 'amount',
+                    align: "center",
+                    width: '70',
+                    formatter:function (val) {
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function (val) {
+                        return '<input type="text" name="remark" value="'+val+'">'
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+       //合计
+        $('#datagrid').on('keyup','[name=number]',function () {
+            var val=Number($(this).val());
+            var price=Number($(this).parents('tr').find('td[field=price]').text());
+            if(val==''){
+                val=0
+            }
+            var all=val*price;
+            $(this).parents('tr').find('td[field=amount]').text(all);
+            getAllPrice();
+
+        });
+
+        //合计行
+        var sumdata = eval('({"number":"0","amount":"0"})');
+        datagrid.sumRow(sumdata,0);
+
+        $('#datagrid').find('.sum-table tr').find('td[field=materialBrand]').text('需求量 :')
+        $('#datagrid').find('.sum-table tr').find('td[field=price]').text('总金额 :')
+
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on')
+        });
+
+        //点击添加行
+        $("#datagrid").on("click", ".addrow", function(e) {
+            if(warehouseId.length > 0){
+                if($('#datagrid').find('.table-body').find('tr').length==0){
+                    addrow();
+                }else {
+                    if($('#datagrid').find('.table-body').find('tr:last').find('td[field=number]').find('input').val()!=''){
+                        addrow();
+                    }else {
+                        return false
+                    }
+                }
+            }else {
+                ITSOFT.tools.showMsg('error','请先选择库房')
+            }
+        });
+
+        //删除行
+        $('#datagrid').on('click','.delBtn',function () {
+            var elem=$(this);
+            ITSOFT.itWin.confirm('确定要删除吗?',function () {
+                var row=elem.parents('tr');
+                row.fadeTo("slow", 0.02, function() {
+                    $(this).slideUp("fast", function() {
+                        $(this).remove();
+                        datagrid.rowIndex()
+                    });
+                });
+            });
+        });
+
+
+        function addrow() {
+            datagrid.addRow(0, null, null);
+            var row = $("#datgrid1 .table-body tr").last();
+            $(row).find("input").eq(0).focus();
+        }
+
+        //上下键
+        $('#datagrid').on('keydown','input',function (e) {
+            //38上
+            //40下
+            //37左
+            //39右
+            var key=e.keyCode;
+//       var index=$("#datagrid input").index(this);
+            var index=$(this).parents('tr').find('input').index(this);
+            if(key==38){
+                $(this).parents('tr').prev('tr').find('input').eq(index).focus()
+            }
+            if(key==40){
+                $(this).parents('tr').next('tr').find('input').eq(index).focus()
+            }
+            if(key==37){
+                index-=1
+                $(this).parents('tr').find('input').eq(index).focus()
+            }
+            if(key==39){
+                index+=1
+                $(this).parents('tr').find('input').eq(index).focus()
+            }
+        })
+
+
+        //input回车搜索
+        var isNext=false
+        $('#datagrid').on('keydown','input',function (e) {
+            var key=e.keyCode;
+            if(key==13){
+                var nxtIdx = $("#datagrid input").index(this);
+                if($(this).parent("td").attr("field") == "materialCode"){
+                    if(!getItemCod($(this))) {
+                        isNext = true
+                    }else {
+                        isNext = false
+                    }
+                }else {
+                    if($(this).parent("td").attr("field") == "materialName"){
+                        if($(this).val()!=""){
+                            isNext = true
+                        }else {
+                            isNext = false
+                        }
+                    }else {
+                        if($("#datagrid").find('input').eq(nxtIdx).val!=''){
+                            isNext=true
+                        }else {
+                            isNext=false
+                        }
+                    }
+
+                }
+                if(isNext){
+                    if($("#datagrid").find('input').eq(nxtIdx).val!=''){
+                        nxtIdx+=1
+                        isNext=true
+                    }else {
+                        isNext=false
+                    }
+                    $("#datagrid").find('input').eq(nxtIdx).focus();
+                    var lastrow = $("#datagrid").find('input').length-1;
+                    var currows = $("#datagrid input").index(this);
+                    if (lastrow == currows) {
+                        addrow();
+                        $("#datagrid").find('input').eq(nxtIdx).focus();
+                    }
+                }
+
+            }else {
+                if($(this).parent("td").attr("field") == "materialName"){
+                    var obj = $(this);
+                    var val=$(this).val();
+                    var menu = obj.nextAll(".table-search-menu");
+                    loadSearchData(menu,val)
+                }
+            }
+        });
+
+        function getItemCod(el) {
+            var val=el.val();
+            if(!!val){
+                // var selectedData = '';
+                // $('#datagrid').find('.datagrid-body').find('tr').each(function (i,o) {
+                //     var materialId = $(o).find('td[field=materialId]').text();
+                //     if (!!materialId){
+                //         selectedData += ','+ materialId;
+                //     }
+                // });
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningMaterial/getLikeMaterial',
+                    type: 'post',
+                    data:{materialCode:val,warehouseId:warehouseId,selectedMaterial:''},
+                    async: true,
+                    beforeSend: function() {},
+                    success: function(res) {
+                        if (res.errorCode == 0) {
+                            if (res.data.total == 1) {
+                                var col = res.data.rows[0];
+                                var row = datagrid.getSelectedRow();
+                                //材料id
+                                row.children("td[field='materialId']").text(col.id);
+                                //材料编码
+                                row.children("td[field='materialCode']").children("input").val(col.number);
+                                //原料名称
+                                row.children("td[field='materialName']").children("input").val(col.name);
+                                //原料类别id
+                                row.children("td[field='materialTypeId']").text(col.typeId);
+                                //原料类别
+                                row.children("td[field='materialTypeName']").text(col.materialTypeName);
+                                //规格
+                                row.children("td[field='materialModule']").text(col.specification);
+                                //单位
+                                row.children("td[field='materialUnit']").text(col.unit);
+                                //品牌
+                                row.children("td[field='materialBrand']").text(col.brand);
+                                //单价
+                                row.children("td[field='price']").text(col.supplyPrice);
+                                //原料数量
+                                row.children("td[field='number']").children("input").val(0);
+                                //原料金额
+                                row.children("td[field='amount']").text(0);
+                                //备注
+                                row.children("td[field='remark']").text(col.remark);
+                                row.attr("ischange", "1")
+                            } else {
+                                ITSOFT.itWin.open({
+                                    title: '选择原料[1，打钩选中原料 2，点确定进行添加 3，可以多选]',
+                                    area: ['900px', '500px'],
+                                    content: ['[[${root}]]/redirect/demand/addReportDetails?materialNumber='+val,'no']
+                                })
+                            }
+                        }else{
+                            ITSOFT.tools.showMsg("error", "获取原料信息失败");
+                            return false;
+                        }
+                    },
+                    complete: function() {
+
+                    },
+                    error: function() {
+                        ITSOFT.tools.showMsg("error", "数据加载失败")
+                    }
+                });
+            }else {
+                return true
+            }
+        }
+        //名称加载。。。
+        function loadSearchData(menu,val) {
+            if(val!=''){
+                var selectedData = '';
+                // $('#datagrid').find('.datagrid-body').find('tr').each(function (i,o) {
+                //     var materialId = $(o).find('td[field=materialId]').text();
+                //     if (!!materialId){
+                //         selectedData += ','+ materialId;
+                //     }
+                // });
+                $(menu).empty();
+                var $loading = $("<div class='loading'>加载中...</div>");
+                $(menu).append($loading)
+                if (menu.is(":hidden")) {
+                    $(document).find(".table-search-menu").hide();
+                    menu.show();
+                };
+                var queryParams = {
+                    "warehouseId": warehouseId,
+                    "materialName": val,
+                    "selectedMaterial":''
+                };
+                //查询数据
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningMaterial/getLikeMaterial',
+                    type: 'post',
+                    async: true,
+                    data: queryParams,
+                    beforeSend: function() {},
+                    success: function(res) {
+                        if (res.data.total > 0) {
+                            $.each(res.data.rows, function(i, row) {
+                                var $table = $("<ul class='table-search'/>");
+                                //id
+                                $table.append('<li  field="materialId"  style="display:none">' + row.id + '</li>')
+                                //编码
+                                $table.append('<li  field="materialCode"  style="display:none">' + row.number + '</li>')
+                                //类别id
+                                $table.append('<li  field="materialTypeId"  style="display:none">' + row.typeId + '</li>')
+                                //单价
+                                $table.append('<li  field="price"  style="display:none">' + row.supplyPrice + '</li>')
+                                //数量
+                                $table.append('<li  field="number"  style="display:none">0</li>')
+                                //金额
+                                $table.append('<li  field="amount"  style="display:none">0</li>')
+                                //备注
+                                $table.append('<li  field="remark"  style="display:none">' + row.remark + '</li>')
+                                //原料名称
+                                $table.append('<li field="materialName" style="width:178px; text-align:left;">' + row.name + '</li>')
+                                //原料类别
+                                $table.append('<li field="materialTypeName" style="width:150px">' + row.materialTypeName + '</li>')
+                                //原料规格
+                                $table.append('<li field="materialModule"  style="width:100px">' + row.specification + '</li>')
+                                //原料单位
+                                $table.append('<li field="materialUnit" style="width:80px">' + row.unit + '</li>')
+                                //原料品牌
+                                $table.append('<li field="materialBrand" style="width:150px">' + row.brand + '</li>')
+                                menu.append($table);
+                            });
+                        }
+                    },
+                    complete: function() {
+                        $(menu).find(".loading").remove();
+                    },
+                    error: function() {
+                        ITSOFT.tools.showMsg("error", "数据加载失败")
+                    }
+                });
+            }else {
+                return true
+            }
+            $(document).on("click", ".table-search-menu ul", function(e) {
+                $(this).siblings().removeClass('currentrow').end().addClass('currentrow');
+                var curmenurow = menu.find(".currentrow");
+                if (curmenurow.length == 0) return false;
+                var cols = '[{';
+                curmenurow.find("li").each(function() {
+                    cols += '"' + $(this).attr("field") + '":"' + $(this).text().trim() + '",';
+                });
+                cols += '"itsfot":""}]';
+                editrow(datagrid.getSelectedRow(), JSON.parse(cols));
+                $(this).parents('tr').find('td[field=number]').find('input').focus();
+                menu.hide();
+            });
+            function editrow(row, data) {
+                $.each(data, function(i, col) {
+                    //材料id
+                    row.children("td[field='materialId']").text(col.materialId);
+                    //材料编码
+                    row.children("td[field='materialCode']").children("input").val(col.materialCode);
+                    //原料名称
+                    row.children("td[field='materialName']").children("input").val(col.materialName);
+                    //原料类别id
+                    row.children("td[field='materialTypeId']").text(col.materialTypeId);
+                    //原料类别
+                    row.children("td[field='materialTypeName']").text(col.materialTypeName);
+                    //规格
+                    row.children("td[field='materialModule']").text(col.materialModule);
+                    //单位
+                    row.children("td[field='materialUnit']").text(col.materialUnit);
+                    //品牌
+                    row.children("td[field='materialBrand']").text(col.materialBrand);
+                    //单价
+                    row.children("td[field='price']").text(col.price);
+                    //原料数量
+                    row.children("td[field='number']").children("input").val(col.number);
+                    //原料金额
+                    row.children("td[field='amount']").text(col.amount);
+                    //备注
+                    row.children("td[field='remark']").text(col.remark);
+                    row.attr("ischange", "1")
+                });
+            }
+        };
+        //更多
+        $('#datagrid').on('click','.iconfont-more',function () {
+            // $('#datagrid').find('.datagrid-body').find('tr').each(function (i,o) {
+            //     var materialId = $(o).find('td[field=materialId]').text();
+            //     if (!!materialId){
+            //         selectedMaterial += ','+ materialId;
+            //     }
+            // });
+            ITSOFT.itWin.open({
+                title:'选择原料[1，打钩选中原料 2，点确定进行添加 3，可以多选]',
+                area:['900px','500px'],
+                content:['[[${root}]]/redirect/demand/addReportDetails?warehouseId='+warehouseId,'no']
+            })
+            $(this).parents('tr').find('td[field=number]').find('input').focus()
+        });
+
+        //计算金额
+        datagrid.on('blur','.number',function () {
+            var number = $(this).val();
+            var price = $(this).parents('tr').children("td[field='price']").text();
+            $(this).parents('tr').children("td[field='amount']").text(number*price);
+        })
+
+        //验证
+        $("#addform").validate({
+            rules: {
+                supplyTimeValue: {
+                    required: true
+                },
+                wareHousetext: {
+                    required: true
+                },
+                demandUnittext: {
+                    required: true
+                }
+            },
+            messages: {
+                supplyTimeValue: {
+                    required: "请选择供应时间"
+                },
+                wareHousetext: {
+                    required: "请选择库房",
+                },
+                demandUnittext: {
+                    required: "请选择需求单位",
+                }
+            },
+            onkeyup: false,
+            focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    beforeSend: function () {
+                        loadingindex = parent.ITSOFT.itWin.msg("正在提交数据", 16);
+                        $("#btn-ok").text("正在提交");
+                    },
+                    success: function (data) {
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            parent.datagrid.insertRow(data.data.obj);
+                            parent.ITSOFT.tools.showMsg("ok", data.message);
+                            if (data.data.obj.status == 0){
+                                window.location.href = '[[${root}]]/redirect/demand/addDemandReport?id='+data.data.obj.id;
+                            } else{
+                                ITSOFT.itWin.open({
+                                    title:'系统提示',
+                                    area:['400px','200px'],
+                                    content:['[[${root}]]/redirect/demand/isAddNewReport?id='+data.data.obj.id,'no']
+                                });
+                            }
+                        } else {
+                            parent.ITSOFT.tools.showMsg("error", data.message);
+                            $("#btn-ok").text("保存");
+                        }
+                    },
+                    error: function () {
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        parent.ITSOFT.tools.showMsg("error", "提交失败")
+                    }
+                });
+            }
+        });
+        //新建
+       function addNew() {
+           ITSOFT.itWin.confirm('新建计划已填写的内容回重置,确定新建吗?', function() {
+               window.location.href = '[[${root}]]/redirect/demand/addDemandReport';
+           })
+       }
+       //保存
+       function saveRow() {
+           submitData(0)
+       }
+        //上报
+       function saveUpRow() {
+           var demandDetailJsonStr = '[';
+           var materialArray = [];
+           var flag = false;
+           $('#datagrid').find('.table-body').find('tr').each(function(i,o){
+               if (i == 0){
+                   demandDetailJsonStr += '{'
+               }else{
+                   demandDetailJsonStr += ',{'
+               }
+               var materialId=$(o).find('td[field="materialId"]').text();
+               if (!!materialId){
+                   materialArray.push(materialId)
+                   var materialName=$(o).find('td[field="materialName"]').find("input").val();
+                   var materialCode=$(o).find('td[field="materialCode"]').find("input").val();
+                   var materialTypeName=$(o).find('td[field="materialTypeName"]').text();
+                   var materialTypeId=$(o).find('td[field="materialTypeId"]').text();
+                   var materialModule=$(o).find('td[field="materialModule"]').text();
+                   var materialBrand=$(o).find('td[field="materialBrand"]').text();
+                   var materialUnit=$(o).find('td[field="materialUnit"]').text();
+                   var price=$(o).find('td[field="price"]').text();
+                   var number=$(o).find('td[field="number"]').find("input").val();
+                   if (isNaN(parseFloat(number)) || parseFloat(number) <= 0) {
+                       ITSOFT.tools.showMsg("error", "第【" + (i + 1) + "】行未输入数量！");
+                       flag = false;
+                       return false;
+                   }
+                   var amount=$(o).find('td[field="amount"]').text();
+                   var remark=$(o).find('td[field="remark"]').text();
+                   demandDetailJsonStr += '"materialId":"' + materialId + '",';
+                   demandDetailJsonStr += '"materialName":"' + materialName + '",';
+                   demandDetailJsonStr += '"materialCode":"' + materialCode + '",';
+                   demandDetailJsonStr += '"materialTypeName":"' + materialTypeName + '",';
+                   demandDetailJsonStr += '"materialTypeId":"' + materialTypeId + '",';
+                   demandDetailJsonStr += '"materialModule":"' + materialModule + '",';
+                   demandDetailJsonStr += '"materialBrand":"' + materialBrand + '",';
+                   demandDetailJsonStr += '"materialUnit":"' + materialUnit + '",';
+                   demandDetailJsonStr += '"price":"' + price + '",';
+                   demandDetailJsonStr += '"number":"' + number + '",';
+                   demandDetailJsonStr += '"amount":"' + amount + '",';
+                   demandDetailJsonStr += '"remark":"' + remark + '"}';
+                   flag = true;
+               }
+           })
+           demandDetailJsonStr += ']';
+            if (flag){
+                ITSOFT.itWin.open({
+                title:'上报',
+                area:['350px','240px'],
+                content:['[[${root}]]/redirect/demand/sureCommitReport','no']
+                })
+            }else{
+                parent.ITSOFT.tools.showMsg("error", "请选择原料");
+                return false;
+            }
+       }
+       //收藏夹导入
+       function favoriteRows() {
+         // if(warehouseId!=''){
+            ITSOFT.itWin.open({
+                full:true,
+                content:['[[${root}]]/redirect/demand/myCollectionsReport?restaurantId='+restaurantId,'no'],
+                closeBtn:0
+            })
+         // }else {
+         //    ITSOFT.tools.showMsg('error','请先选择库房')
+         // }
+       }
+       if (('[[${type}]]' == 'report' && !!'[[${diningDemand.id}]]') || !!!'[[${diningDemand.id}]]'){
+           getRowTime(2)
+       }
+      function getRowTime(key) {
+        var t=new Date();
+        var y=t.getFullYear();
+        var m=parseInt(t.getMonth()+1);
+        var d=parseInt(t.getDate());
+        var nt='';
+        if(m<10){
+          m='0'+m
+        }
+
+        if(key==1){
+          if(d<10){
+            d='0'+d
+          }
+           nt=y+'-'+m+'-'+d
+        }
+        if(key==2) {
+           d+=1;
+          if(d<10){
+            d='0'+d
+          }
+          nt=y+'-'+m+'-'+d
+        }
+        if(key==3) {
+          d+=2
+          if(d<10){
+            d='0'+d
+          }
+          nt=y+'-'+m+'-'+d
+        }
+        $('#supplyTimeValue').val(nt)
+      }
+
+      //删除需求单
+      function delReport() {
+         var msg='确定要删除需求单？'
+         ITSOFT.itWin.confirm(msg,function () {
+             ITSOFT.dataAjax({
+                 url: '[[${root}]]/api/v2/dining/manage/demandReport/deleteDiningDemandById',
+                 type: 'post',
+                 data: {id:'[[${diningDemand.id}]]'},
+                 async: false,
+                 beforeSend: function () {
+                     loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                 },
+                 success: function (data) {
+                     ITSOFT.itWin.close(loadingindex);
+                     if (data.errorCode == 0) {
+                         ITSOFT.tools.showMsg("ok", data.message);
+                         //执行成功后删除datagrid数据
+                         parent.datagrid.deleteRow('[[${diningDemand.id}]]');
+                         parent.ITSOFT.itWin.close(index)
+                     } else {
+                         ITSOFT.tools.showMsg("error", data.message);
+                         return false;
+                     }
+                 },
+                 error: function () {
+                     ITSOFT.itWin.close(loadingindex);
+                     ITSOFT.tools.showMsg("error", "删除需求计划出错");
+                 },
+                 complete: function () {
+                     ITSOFT.itWin.close(loadingindex);
+                 }
+             });
+         })
+      }
+
+
+    });
+    function insertrow(data) {
+        var currentrow = datagrid.getSelectedRow(); //当前行
+          $.each(data,function (i,col) {
+            if(i==0){
+              //材料id
+              currentrow.children("td[field='materialId']").text(col.materialId);
+              //材料编码
+              currentrow.children("td[field='materialCode']").children("input").val(col.materialCode);
+              //原料名称
+              currentrow.children("td[field='materialName']").children("input").val(col.materialName);
+              //原料类别id
+              currentrow.children("td[field='materialTypeId']").text(col.materialTypeId);
+              //原料类别
+              currentrow.children("td[field='materialTypeName']").text(col.materialTypeName);
+              //规格
+              currentrow.children("td[field='materialModule']").text(col.materialModule);
+              //单位
+              currentrow.children("td[field='materialUnit']").text(col.materialUnit);
+              //品牌
+              currentrow.children("td[field='materialBrand']").text(col.materialBrand);
+              //单价
+              currentrow.children("td[field='price']").text(col.price);
+              //原料数量
+              currentrow.children("td[field='number']").children("input").val(col.number);
+              //原料金额
+              currentrow.children("td[field='amount']").text(col.amount);
+              //备注
+              currentrow.children("td[field='remark']").text(col.remark);
+              currentrow.attr("ischange", "1")
+
+            }else {
+              datagrid.addRow(0,null,col);
+              currentrow.attr("ischange", "1");
+            }
+          })
+    }
+
+
+
+     function closeIndex() {
+       parent.ITSOFT.itWin.close(index)
+     }
+     function newIndex() {
+         window.location.href = '[[${root}]]/redirect/demand/addDemandReport';
+     }
+    function submitData(status) {
+        $('#status').val(status);
+        var demandDetailJsonStr = '[';
+        var materialArray = [];
+        var flag = true;
+        $('#datagrid').find('.table-body').find('tr').each(function(i,o){
+            if (i == 0){
+                demandDetailJsonStr += '{'
+            }else{
+                demandDetailJsonStr += ',{'
+            }
+            var materialId=$(o).find('td[field="materialId"]').text();
+            if (!!materialId){
+                materialArray.push(materialId)
+                var materialName=$(o).find('td[field="materialName"]').find("input").val();
+                var materialCode=$(o).find('td[field="materialCode"]').find("input").val();
+                var materialTypeName=$(o).find('td[field="materialTypeName"]').text();
+                var materialTypeId=$(o).find('td[field="materialTypeId"]').text();
+                var materialModule=$(o).find('td[field="materialModule"]').text();
+                var materialBrand=$(o).find('td[field="materialBrand"]').text();
+                var materialUnit=$(o).find('td[field="materialUnit"]').text();
+                var price=$(o).find('td[field="price"]').text();
+                var number=$(o).find('td[field="number"]').find("input").val();
+                if (isNaN(parseFloat(number)) || parseFloat(number) <= 0) {
+                    ITSOFT.tools.showMsg("error", "第【" + (i + 1) + "】行未输入数量！");
+                    flag = false;
+                    return false;
+                }
+                var amount=$(o).find('td[field="amount"]').text();
+                var remark=$(o).find('td[field="remark"]').text();
+                demandDetailJsonStr += '"materialId":"' + materialId + '",';
+                demandDetailJsonStr += '"materialName":"' + materialName + '",';
+                demandDetailJsonStr += '"materialCode":"' + materialCode + '",';
+                demandDetailJsonStr += '"materialTypeName":"' + materialTypeName + '",';
+                demandDetailJsonStr += '"materialTypeId":"' + materialTypeId + '",';
+                demandDetailJsonStr += '"materialModule":"' + materialModule + '",';
+                demandDetailJsonStr += '"materialBrand":"' + materialBrand + '",';
+                demandDetailJsonStr += '"materialUnit":"' + materialUnit + '",';
+                demandDetailJsonStr += '"price":"' + price + '",';
+                demandDetailJsonStr += '"number":"' + number + '",';
+                demandDetailJsonStr += '"amount":"' + amount + '",';
+                demandDetailJsonStr += '"remark":"' + remark + '"}';
+            }
+        })
+        demandDetailJsonStr += ']';
+        if (flag){
+            if (materialArray.length<1){
+                parent.ITSOFT.tools.showMsg("error", "请选择原料");
+                return false;
+            }else{
+                // var materialArrayStr = JSON.stringify(materialArray);
+                // for (var i = 0; i < materialArray.length; i++) {
+                //     if (materialArrayStr.indexOf(materialArray[i]) != materialArrayStr.lastIndexOf(materialArray[i])){
+                //         parent.ITSOFT.tools.showMsg("error", "不能重复选择原料");
+                //         return false;
+                //     }
+                // }
+                $("#demandDetailJsonStr").val(demandDetailJsonStr);
+                $("#addform").submit();
+            }
+        }
+    }
+
+    function getAllPrice() {
+        var num=0,price=0;
+        $('#datagrid').find('.datagrid-body .table-body tr').each(function (i) {
+            var n=Number($(this).find('td[field=number]').find('input').val());
+            var p=Number($(this).find('td[field=amount]').text());
+            num+=n;
+            price+=p;
+        });
+        var sumdata = eval('({"number":"'+num+'","amount":"'+price+'"})');
+        datagrid.sumRow(sumdata,0);
+    }
+</script>
+</html>

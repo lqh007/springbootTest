@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>需求计划单审批</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../itsoftui/plugins/pikaday/pikaday.css" />
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .timeBtn span{
+            margin-top: 0;
+        }
+        .table-search-menu{
+            width: 660px!important;
+        }
+        .tip{
+            color: #aa1111;
+        }
+        .orderlog{
+            position: absolute;
+            height: 145px;
+            overflow: auto;
+            right: 2px;
+            line-height: 25px;
+            top: 0px;
+            width: 460px;
+        }
+        .line-row{
+            margin:15px 0;
+            position: relative;
+        }
+        .cause{
+             width: 240px;
+             vertical-align: top;
+             display: inline-block;
+             white-space: nowrap;
+             text-overflow: ellipsis;
+             overflow: hidden;
+        }
+        .line{
+            width: 2px;
+            background-color: #2e8ded;
+            position: absolute;
+            top:18px;
+            left:129px;
+            height: 27px;
+            z-index: 6666;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划->需求上报->已驳回需求单</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-panel-form">
+                <form id="addform" class="form form-horizontal" action="ajaxOperation.ashx?Action=formUpload" method="post" enctype="multipart/form-data" style="width:720px">
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;">单据号：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <input type="text" name="gysname" value="XQ20180306" disabled="disabled" class="form-control">
+                        </div>
+
+                        <label class="col-md-1 control-label" style="width: 90px;"><em class="tip">*</em>供应时间：</label>
+                        <div class="col-md-1" style="width: 200px;">
+                            <!--注意日历input必需设置id-->
+                            <input type="text" id="gyTime" name="gyTime" value="2018-03-06" class="form-control">
+                            <i class="iconfont iconfont-arrow2-bottom" style=" float:right; position: absolute; top:2px;right:20px"></i>
+                        </div>
+                        <!--<div class="timeBtn btnop">-->
+                            <!--<span class="yj3">今天</span>-->
+                            <!--<span class="yj3">明天</span>-->
+                            <!--<span class="yj3">后天</span>-->
+                        <!--</div>-->
+                    </div>
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;"><em class="tip">*</em>库房：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <div id="wareHouse" class="dropdownlist" name="wareHouse">
+                            </div>
+                        </div>
+                        <label class=" col-md-1  control-label" style="width: 90px;"><em class="tip">*</em>需求单位：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <div id="demandUnit" class="dropdownlist" name="demandUnit">
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 80px;">备注：</label>
+                        <div class="col-md-1 " style="width: 640px;">
+                            <input type="text" name="bz" value="123" class="form-control">
+                        </div>
+                    </div>
+                </form>
+                <div id="orderlog" class="orderlog">
+                    <div class="line-box">
+                        <div class="line-row">
+                            <span>2018-02-01 10:10</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                        <div class="line-row">
+                            <span>2018-02-06 09:20</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/pikaday/pikaday.js" type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    $(function () {
+        $('.line-box').find('.line-row:last').find('.line').hide();
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //库房下拉
+        $('#wareHouse').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择库房',
+            width:'182px',
+            selectText:'101库房',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //需求单位
+        $('#demandUnit').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择需求单位',
+            width:'182px',
+            selectText:'学子食府',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'新建需求单',
+                    title:'新建需求单',
+                    width:'120px',
+                    icon:"iconfont-add",
+                    click:function () {
+
+                    }
+                },
+                {
+                    text:'批量上报',
+                    title:'批量上报',
+                    width:'120px',
+                    icon:"iconfont-edit",
+                    click:function () {
+                        editRow()
+                    }
+                }
+            ]
+        });
+        //供应时间
+        var pickerydrq = new Pikaday({
+            field: document.getElementById('gyTime'),
+            firstDay: 1,
+            format: 'YYYY-MM-DD',
+            minDate: ITSOFT.tools.dateCalDay(1, 0), //today
+            maxDate: ITSOFT.tools.dateCalDay(1, 30), //30days  后
+            yearRange: [2010, 2020]
+        });
+        //列表
+        datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '<a title="添加行" class="iconfont listbtn addrow iconfont-add"></a>',
+                    width: '30',
+                    formatter: function(val, i) {
+                        return '<a title="删除行" class="iconfont listbtn delrow iconfont-del"></a>';
+                    }
+                },{
+                    title: '编码',
+                    field: 'state',
+                    align: "center",
+                    width: '120',
+                    formatter:function (val) {
+                        return '<input type="text" value="XQ131313" name="coding">'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'rawName',
+                    align: "center",
+                    width: '180',
+                    overflow: "visible",
+                    formatter:function () {
+                        return '<input type="text" name="rawName" data=""  value="菠菜">' +
+                            '<a class="iconfont listbtn iconfont-more"></a>' +
+                            '<div class="table-search-menu"></div>';
+                    }
+                },
+                {
+                    title: '原料类别',
+                    field: 'rawType',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '蔬菜'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'rawUnit',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return ''
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'rawDw',
+                    align: "center",
+                    width: '80',
+                    formatter:function () {
+                        return '斤'
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'rawBrand',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return ''
+                    }
+                },
+                {
+                    title: '需求量',
+                    field: 'reportTime',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '<input type="text" value="10">'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return '<input type="text" value=" ">'
+                    }
+                },
+            ]
+        });
+        datagrid.loadData()
+
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on')
+        });
+
+        //点击添加行
+        $("#datagrid").on("click", ".addrow", function(e) {
+            addrow();
+        });
+
+        function  addrow() {
+
+            datagrid.addRow(0, null, null);
+            var row = $("#datgrid1 .table-body tr").last();
+            $(row).find("input").eq(0).focus();
+        }
+
+        //编码input搜索
+        $('#datagrid').on('keydown','input[name="coding"]',function (e) {
+            var key=e.keyCode;
+            var val=$(this).val();
+            if(key==13){
+                var queryParams = {
+                    "kfid": "0",
+                    "findvalue": val
+                };
+                //查询数据
+                ITSOFT.dataAjax({
+                    url: '../../../../../../data/material.json',
+                    type: 'GET',
+                    async: true,
+                    data: queryParams,
+                    beforeSend: function() {},
+                    success: function(res) {
+                        if (res.data.length > 0) {
+                            var col=res.data[0];
+                            var row=datagrid.getSelectedRow();
+                            //材料id
+                            row.children("td[field='mid']").text(col.id);
+                            //原料名称
+                            row.children("td[field='rawName']").children("input").val(col.name);
+                            //原料类别
+                            row.children("td[field='rawType']").text(col.spec);
+                            //规格
+                            row.children("td[field='rawUnit']").text(col.unit);
+                            //单位
+                            row.children("td[field='rawDw']").text(col.unit);
+                            //品牌
+                            row.children("td[field='rawBrand']").text(col.unit);
+                            row.attr("ischange", "1")
+                        }
+                    },
+                    complete: function() {
+
+                    },
+                    error: function() {
+                        ITSOFT.tools.showMsg("error", "数据加载失败")
+                    }
+                });
+            }
+        });
+
+
+        var  _time;
+        //原料名称查询
+        $('#datagrid').on('keydown','input[name="rawName"]',function () {
+            var obj = $(this);
+            var menu = obj.nextAll(".table-search-menu");
+            clearTimeout(_time);
+            _time = setTimeout(function() {
+                loadSearchData(menu, obj.val().trim());
+            }, 300);
+        });
+
+        function loadSearchData(menu,val) {
+            $(menu).empty();
+            var $loading = $("<div class='loading'>加载中...</div>");
+            $(menu).append($loading)
+            if (menu.is(":hidden")) {
+                $(document).find(".table-search-menu").hide();
+                menu.show();
+            };
+            var queryParams = {
+                "kfid": "0",
+                "findvalue": val
+            };
+            //查询数据
+            ITSOFT.dataAjax({
+                url: '../../../../../../data/material.json',
+                type: 'GET',
+                async: true,
+                data: queryParams,
+                beforeSend: function() {},
+                success: function(res) {
+                    if (res.data.length > 0) {
+                        $.each(res.data, function(i, row) {
+                            var $table = $("<ul class='table-search'/>");
+                            //id
+                            $table.append('<li  field="rawId"  style="display:none">' + row["id"] + '</li>')
+                            //原料名称
+                            $table.append('<li field="rawName" style="width:178px; text-align:left;"  >' + row["name"] + '</li>')
+                            //原料类别
+                            $table.append('<li field="rawType" style="width:150px"  >' + row["barcode"] + '</li>')
+                            //原料规格
+                            $table.append('<li field="rawUnit"  style="width:100px"  >' + row["spec"] + '</li>')
+                            //原料单位
+                            $table.append('<li field="rawDw" style="width:80px"  >' + row["unit"] + '</li>')
+                            //原料品牌
+                            $table.append('<li field="rawBrand" style="width:150px"  >' + row["manufacturers"] + '</li>')
+                            menu.append($table);
+                        });
+                    }
+                },
+                complete: function() {
+                    $(menu).find(".loading").remove();
+                },
+                error: function() {
+                    ITSOFT.tools.showMsg("error", "数据加载失败")
+                }
+            });
+            $(document).on("click", ".table-search-menu ul", function(e) {
+                $(this).siblings().removeClass('currentrow').end().addClass('currentrow');
+                var curmenurow = menu.find(".currentrow");
+                if (curmenurow.length == 0) return false;
+                var cols = '[{';
+                curmenurow.find("li").each(function() {
+                    cols += '"' + $(this).attr("field") + '":"' + $(this).text().trim() + '",';
+                });
+                cols += '"itsfot":""}]';
+                editrow(datagrid.getSelectedRow(), JSON.parse(cols));
+                menu.hide();
+            });
+            function editrow(row, data) {
+                console.log(data)
+                $.each(data, function(i, col) {
+                    //材料id
+                    row.children("td[field='mid']").text(col["id"]);
+                    //原料名称
+                    row.children("td[field='rawName']").children("input").val(col.rawName);
+                    //原料类别
+                    row.children("td[field='rawType']").text(col.rawType);
+                    //规格
+                    row.children("td[field='rawUnit']").text(col.rawUnit);
+                    //单位
+                    row.children("td[field='rawDw']").text(col.rawDw);
+                    //品牌
+                    row.children("td[field='rawBrand']").text(col.rawBrand);
+                    row.attr("ischange", "1")
+                });
+
+            }
+
+        };
+        //更多
+        $('#datagrid').on('click','.iconfont-more',function () {
+            ITSOFT.itWin.open({
+                title:'选择原料[1，打钩选中原料 2，点确定进行添加 3，可以多选]',
+                area:['900px','500px'],
+                content:['addReportRow.html','no']
+            })
+        });
+    });
+    function insertrow(data) {
+        var currentrow = datagrid.getSelectedRow(); //当前行
+        $.each(data, function(i, col) {
+            if (i == 0) {
+                //材料id
+                currentrow.children("td[field='mid']").text(col["mid"]);
+                //材料名称
+                currentrow.children("td[field='mname']").children("input").val(col["mname"]);
+                //这句话目的为了验证输入的值和选中的值
+                currentrow.children("td[field='mname']").children("input").attr("data", col["mname"]);
+                //材料国际码
+                currentrow.children("td[field='mbarcode']").text(col["mbarcode"]);
+                //材料规格
+                currentrow.children("td[field='mspec']").text(col["mspec"]);
+                //材料单位
+                currentrow.children("td[field='munit']").text(col["munit"]);
+                //材料厂家
+                currentrow.children("td[field='mmanufacturers']").text(col["mmanufacturers"]);
+                currentrow.attr("ischange", "1")
+            } else {
+                var newdata = {
+                    'orderid': '0'
+                }; //orderid 合并进去
+                $.extend(true, col, newdata);
+                currentrow = datagrid.addRow(0, null, col,currentrow);
+                currentrow.attr("ischange", "1");
+            }
+
+        });
+
+    }
+
+
+
+
+</script>
+</html>

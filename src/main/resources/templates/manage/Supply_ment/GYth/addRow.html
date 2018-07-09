@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>选择原料</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        #datgrid{
+            height: 200px!important;
+        }
+        #datgrid .datagrid-body{
+            height: 163px!important;
+        }
+        #datagridMx{
+            height: 155px!important;
+        }
+        #datagridMx .datagrid-body{
+            height: 118px!important;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10">
+    <div class="itsoft-panel">
+        <div class="itsoft-toolbar">
+            <div style="float: left;line-height: 45px;margin-right: 50px">
+                <span style="font-size: 16px;color: #333;float: left">入库日期：</span>
+                <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                    <input type="text" class= "form-control" name="gyTime" id="gyTime"  style="width: 240px" placeholder="输入或选择日期">
+                    <span class="caret" style="right: 17px"></span >
+                </div>
+            </div>
+            <div style="float: left;margin: 0 20px;line-height: 45px;color: #aa1111">
+                <span>0</span>
+                <span style="color: #aa1111">条被选中</span>
+            </div>
+            <div id="toolBtn" style="float: right"></div>
+            <div id="toolSearch" style="float: right"></div>
+        </div>
+        <div class="itsoft-datagrid" id="datgrid" style="border-top:0;"></div>
+        <div class="itsoft-toolbar" style="line-height: 45px">单据明细 </div>
+        <div class="itsoft-datagrid" id="datagridMx"></div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'编码/拼音码/名称',
+            serachEvent:function (val) {
+                datagrid.refreshData(val)
+            }
+        });
+        //按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[{
+                text:'确定',
+                title:'确定',
+                icon:'iconfont-add',
+                click:function () {
+                    addRow()
+                }
+            }]
+        });
+        //双日历
+        SetDateRangePicker('gyTime', function(start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
+        //单据列表
+        var datagrid = $('#datgrid').datagrid({
+            keyField: "orderid",
+            page:false,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: false,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+                datagridMx.loadData();
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '单据号',
+                    field: 'codNum',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return 'XQSP0123'
+                    }
+                },
+                {
+                    title: '记录数',
+                    field: 'rawName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '蔬菜库房'
+                    }
+                },
+                {
+                    title: '单据金额',
+                    field: 'rawUnit',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '学子食府'
+                    }
+                },
+                {
+                    title: '制单人',
+                    field: 'rawDw',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '制单时间',
+                    field: 'rawPrice',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张大炮'
+                    }
+                },
+                {
+                    title: '审核人',
+                    field: 'rawTime',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-4'
+                    }
+                },
+                {
+                    title: '审核时间',
+                    field: 'rawBrand',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'rawType',
+                    align: "center",
+                    width: '200',
+                    formatter:function (row,i,o) {
+                        return '蔬菜';
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+
+        //明细列表
+        var datagridMx = $('#datagridMx').datagrid({
+            keyField: "orderid",
+            page:false,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '编码',
+                    field: 'codNum',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return 'XQSP0123'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'rawName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '蔬菜库房'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'rawUnit',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '学子食府'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'rawDw',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },{
+                    title: '品牌',
+                    field: 'rawBrand',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '采购价',
+                    field: 'rawPrice',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张大炮'
+                    }
+                },
+                {
+                    title: '数量',
+                    field: 'rawTime',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-4'
+                    }
+                },
+
+                {
+                    title: '金额',
+                    field: 'barcode',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'rawType',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                        return '蔬菜';
+                    }
+                }
+            ]
+        });
+//        datagridMx.loadData();
+
+
+        //点击确定
+        function addRow() {
+            var rows=datagrid.getSelectedRows();
+            if(rows.length==0){
+                ITSOFT.tools.showMsg('error','请选择要添加的行');
+                return false
+            }
+            var cols='[';
+            $(rows).each(function (i,keyvalue) {
+                if(i>0){
+                    cols+=',{'
+                }else {
+                    cols+='{'
+                }
+                //id
+                cols += '"mid":"' +datagrid.getColumnText(keyvalue,"id") + '",';
+                //编码
+                cols += '"codNum":"' +datagrid.getColumnText(keyvalue,"codNum") + '",';
+                //原料名称
+                cols += '"rawName":"' +datagrid.getColumnText(keyvalue,"rawName") + '",';
+                //原料类别
+                cols += '"rawType":"' +datagrid.getColumnText(keyvalue,"rawType") + '",';
+                //原料规格
+                cols += '"rawUnit":"' +datagrid.getColumnText(keyvalue,"rawUnit") + '",';
+                //原料单位
+                cols += '"rawDw":"' +datagrid.getColumnText(keyvalue,"rawDw") + '"}';
+            });
+            cols+=']';
+            parent.insertrow( JSON.parse(cols));
+        }
+
+        //关闭页面
+        function closeRow() {
+            parent.ITSOFT.itWin.close(index)
+        }
+
+
+
+    });
+</script>
+</html>

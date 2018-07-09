@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>保存</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrap{
+            margin: 15px 0 0 25px;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <form id="addform">
+            <div class="form-group row">
+                 <label class="control-label">是否收藏：</label>
+                 <div style="width: 200px;margin-top: 5px">
+                     <div class="radio-box">
+                         <input type="radio" id="radio-1" name="isCollection" value="1" checked>
+                         <label for="radio-1">是</label>
+                     </div>
+                     <div class="radio-box">
+                         <input type="radio" id="radio-2" name="isCollection" value="0">
+                         <label for="radio-2">否</label>
+                     </div>
+                 </div>
+            </div>
+            <div class="form-group row">
+                 <label class="control-label">收藏标题：</label>
+                 <div style="width: 200px">
+                    <input class="form-control" value="" name="collectionTitle">
+                 </div>
+            </div>
+        </form>
+        <div class="btnBox">
+            <div>
+                <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+                <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+   $(function () {
+     $('.radio-box input').iCheck({
+       checkboxClass: 'icheckbox-blue',
+       radioClass: 'iradio-blue',
+       increaseArea: '20%'
+     });
+     $("#btn-ok").on('click', function(event) {
+        var isCollection = $('input[name=isCollection]:checked').val();
+        var collectionTitle = $('input[name=collectionTitle]').val();
+        if (isCollection == 1){
+            if (collectionTitle.length == 0){
+                ITSOFT.tools.showMsg("error", "请填写收藏标题");
+                return false;
+            }
+            parent.$('#isCollection').val(isCollection);
+            parent.$('#collectionTitle').val(collectionTitle);
+        }
+        parent.submitData(1);
+       parent.ITSOFT.itWin.close(index)
+     });
+     $("#btn-cancel").on('click', function(event) {
+         parent.ITSOFT.itWin.close(index)
+     });
+
+   })
+</script>
+</html>

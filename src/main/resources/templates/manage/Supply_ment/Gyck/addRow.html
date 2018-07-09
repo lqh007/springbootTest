@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>选择原料</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .itsoftLt{
+            width: 200px;
+            float: left;
+        }
+        .itsoftRt{
+            margin-left: 205px;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10">
+       <div class="itsoftLt">
+            <div class="itsoft-tree" id="selectTree"></div>
+       </div>
+       <div class="itsoftRt">
+           <div class="itsoft-toolbar">
+               <div id="toolSearch" style="float: left"></div>
+               <div style="float: left;margin: 0 20px;line-height: 45px;color: #aa1111">
+                   <span>0</span>
+                   <span style="color: #aa1111">条被选中</span>
+               </div>
+               <div id="toolBtn" style="float: right"></div>
+           </div>
+           <div  id="datgrid" style="border-top:0 ; float: right; "> </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+        var tree = $("#selectTree").itsofttree({
+            url: "../../../../../../data/kfdata.json",
+            type: "GET",
+            height: "100%",
+            click: function(value, text) {
+                ITSOFT.tools.showMsg("ok", value + text);
+            }
+        });
+
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'编码/拼音码/名称',
+            serachEvent:function (val) {
+               datagrid.refreshData(val)
+            }
+        });
+        //按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[{
+                text:'确定',
+                title:'确定',
+                icon:'iconfont-add',
+                click:function () {
+                    addRow()
+                }
+            },{
+                text:'取消',
+                title:'取消',
+                icon:'iconfont-del2',
+                click:function () {
+                   closeRow()
+                }
+            }]
+        });
+
+     var datagrid = $('#datgrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: false,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '名称',
+                    field: 'itemName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '蔬菜库房'
+                    }
+                },
+                {
+                    title: '批次',
+                    field: 'itemPC',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '学子食府'
+                    }
+                },
+                {
+                    title: '采购价',
+                    field: 'itemCGJ',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '供应价',
+                    field: 'itemGYJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张大炮'
+                    }
+                },
+                {
+                    title: '计划价',
+                    field: 'itemJHJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-4'
+                    }
+                },
+                {
+                    title: '库存量',
+                    field: 'itemKCL',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'itemGG',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'itemDW',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'itemPP',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '编码',
+                    field: 'itemBM',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '拼音码',
+                    field: 'itemPYM',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                      return '蔬菜';
+                    }
+                },
+                {
+                    title: '类别',
+                    field: 'itemLB',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                      return '蔬菜';
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                      return '蔬菜';
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+
+
+        //点击确定
+        function addRow() {
+            var rows=datagrid.getSelectedRows();
+            if(rows.length==0){
+                ITSOFT.tools.showMsg('error','请选择要添加的行');
+                return false
+            }
+            var cols='[';
+            $(rows).each(function (i,keyvalue) {
+                if(i>0){
+                    cols+=',{'
+                }else {
+                    cols+='{'
+                }
+                //id
+                cols += '"mid":"' +datagrid.getColumnText(keyvalue,"id") + '",';
+                //编码
+                cols += '"codNum":"' +datagrid.getColumnText(keyvalue,"codNum") + '",';
+                //原料名称
+                cols += '"itemName":"' +datagrid.getColumnText(keyvalue,"itemName") + '",';
+                //原料类别
+                cols += '"itemType":"' +datagrid.getColumnText(keyvalue,"itemType") + '",';
+                //原料规格
+                cols += '"itemUnit":"' +datagrid.getColumnText(keyvalue,"itemUnit") + '",';
+                //原料单位
+                cols += '"itemDw":"' +datagrid.getColumnText(keyvalue,"itemDw") + '",';
+                //原料批次
+                cols += '"itemPC":"' +datagrid.getColumnText(keyvalue,"itemPC") + '",';
+                //采购价
+                cols += '"itemCGJ":"' +datagrid.getColumnText(keyvalue,"itemCGJ") + '",';
+                //供应价
+                cols += '"itemGYJ":"' +datagrid.getColumnText(keyvalue,"itemGYJ") + '",';
+                //计划价
+                cols += '"itemJHJ":"' +datagrid.getColumnText(keyvalue,"itemJHJ") + '",';
+                //供应金额
+                cols += '"itemGYJE":"' +datagrid.getColumnText(keyvalue,"itemGYJE") + '"}';
+            });
+            cols+=']';
+            parent.insertrow( JSON.parse(cols));
+        }
+
+        //关闭页面
+        function closeRow() {
+            parent.ITSOFT.itWin.close(index)
+        }
+
+
+
+    });
+</script>
+</html>

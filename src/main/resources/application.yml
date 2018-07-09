@@ -32,6 +32,16 @@ spring:
           #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
           pool-prepared-statements: false
           max-pool-prepared-statement-per-connection-size: 20
+          #thymelea模板配置
+          thymeleaf:
+                cache: false
+                check-template: true
+                check-template-location: true
+                prefix: classpath:/templates/
+                suffix: .html
+                encoding: UTF-8
+                content-type: text/html
+                mode: HTML5
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -44,3 +54,5 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     returnPageInfo: check
+
+

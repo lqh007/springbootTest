@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>需求审批</title>
+
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css"
+          th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"
+          th:href="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css"
+          th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css"
+          th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css"
+          th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .restaurant {
+            border: 1px solid #ccc;
+            float: left;
+            margin-top: 5px;
+        }
+
+        .handle {
+            color: #2e8ded;
+            cursor: pointer;
+        }
+
+        .selectrow .handle {
+            color: #fff;
+        }
+
+        .selectrow .state {
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划->需求审批</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd" style="background-color: #fff">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <span style="font-size: 16px;color: #333;float: left;line-height: 44px">请选择餐厅：</span>
+                <div class="dropdownlist restaurant" id="restaurant" name="restaurant"></div>
+            </div>
+            <div class="itsoft-toolbar" style="border-top: 0">
+                <div style="float: left;line-height: 45px;margin-right: 50px;margin-left: 10px;">
+                    <span style="font-size: 16px;color: #333;float: left">供应时间：</span>
+
+                    <div id="toolbarbtnop1" class="btnop timeSearch" style="float: left;">
+                        <span data="all" class="yj2 ">全部</span>
+                        <span data="0" class="yj2 on">本月</span>
+                        <span data="1" class="yj2">本周</span>
+                        <span data="2" class="yj2">昨天</span>
+                        <span data="3" class="yj2">今天</span>
+                        <span data="4" class="yj2">明天</span>
+                    </div>
+                    <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                        <input type="text" class="form-control" name="gyTime" id="gyTime" style="width: 240px"
+                               placeholder="输入或选择日期">
+                        <span class="caret" style="right: 17px"></span>
+                    </div>
+                </div>
+                <div style="float: left;line-height: 45px">
+                    <span style="font-size: 16px;color: #333">状态：</span>
+                    <div id="toolbarbtnop" class="btnop statusSearch">
+                        <span data="all" class="yj2 ">全部</span>
+                        <span data="1" class="yj2 on">待审批</span>
+                        <span data="2" class="yj2">已审批</span>
+                        <span data="2" class="yj2">已驳回</span>
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js"
+        th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js"
+        th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/moment.min.js" type="text/javascript"
+        th:src="@{${root}+'/itsoftui/plugins/moment.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js" type="text/javascript"
+        th:src="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/date.js" type="text/javascript"
+        th:src="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/date.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+
+
+<script>
+    var datagrid;
+    var restaurantId = '';
+    var restaurantName = '';
+    var index = parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '',
+                    title: '关闭',
+                    width: '35px',
+                    icon: 'iconfont-close',
+                    click: function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅状态下拉
+        var restaurantSel = $('#restaurant').dropdownlist({
+            type: 'post',
+            dataurl: '[[${root}]]/api/v2/dining/manage/diningRestaurant/diningRestaurantRolesSelect',
+            // placeholder:'请选择餐厅',
+            width: '160px',
+            autoLoad: true,
+            changeEvent: function (val, text) {
+                if (textName != val) {
+                    textVal = val;
+                    textName = text;
+                    var queryParams = {};
+                    queryParams.restaurantId = val;
+                    datagrid.refreshData(queryParams);
+                    restaurantId = val;
+                    restaurantName = text;
+                }
+            }
+        });
+
+        rolesSelectFunction('restaurant', '餐厅');
+        restaurantId = restaurantSel.getValueText().value;
+        //列表
+        datagrid = $('#datagrid').datagrid({
+            keyField: "id",
+            page: true,
+            url: '[[${root}]]/api/v2/dining/manage/demandReport/diningDemandReportList',
+            type: 'post',
+            line: "both",
+            queryParams: {time: '0', status: '1'},
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function () {
+
+            },
+            dblclick: function () {
+                var row = datagrid.getSelectedRow();
+                var key = row.find('td[field=status]').attr('fieldvalue');
+                editReport(1, key)
+            },
+            columns: [
+                {
+                    field: 'id',
+                    isshow: false
+                },
+                {
+                    title: '状态',
+                    field: 'status',
+                    align: "center",
+                    width: '80',
+                    formatter: function (v) {
+                        if (v == '0') {
+                            return '<span class="state" style="color: #2e8ded">未上报</span>'
+                        }
+                        if (v == '2') {
+                            return '<span  class="state" style="color: #999">已审批</span>'
+                        }
+                        if (v == '3') {
+                            return '<span  class="state"  style="color: red">计划驳回</span>'
+                        }
+                        if (v == '4') {
+                            return '<span  class="state"  style="color: red">汇总驳回</span>'
+                        }
+                    }
+                },
+                {
+                    title: '单据号',
+                    field: 'orderNumber',
+                    align: "center",
+                    width: '140',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '库房',
+                    field: 'warehouseName',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '需求单位',
+                    field: 'requirementUnitName',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '供应时间',
+                    field: 'supplyTime',
+                    align: "center",
+                    width: '130',
+                    formatter: function (v) {
+                        if (!!v) {
+                            return ITSOFT.tools.dateFormat(v, 2);
+                        }
+                    }
+                },
+                {
+                    title: '上报人',
+                    field: 'reportPerson',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '上报时间',
+                    field: 'reportTime',
+                    align: "center",
+                    width: '100',
+                    formatter: function (v) {
+                        if (!!v) {
+                            return ITSOFT.tools.dateFormat(v, 2);
+                        }
+                    }
+                },
+                {
+                    title: '审核人',
+                    field: 'auditPerson',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '审核时间',
+                    field: 'auditTime',
+                    align: "center",
+                    width: '100',
+                    formatter: function (v) {
+                        if (!!v) {
+                            return ITSOFT.tools.dateFormat(v, 2);
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    field: 'editType',
+                    align: "center",
+                    width: '80',
+                    formatter: function (v, i, r) {
+                        if (r.status == 3) {
+                            return '<span class="iconfont handle iconfont-dayinji" data-type="2"></span>';
+                        } else {
+                            return '<span class="iconfont  handle iconfont-edit" data-type="1"></span>';
+                        }
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix: true,
+                    formatter: function () {
+                    }
+                }
+            ]
+        });
+        datagrid.loadData(0);
+        //日历
+        $('.timeSearch').on('click', 'span', function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            var time = $(this).attr('data');
+            var queryParams = {time: time};
+            datagrid.refreshData(queryParams);
+        });
+        //双日历
+        SetDateRangePicker('gyTime', function (start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            var queryParams = {start: start.format('YYYY-MM-DD'),end: end.format('YYYY-MM-DD')};
+            datagrid.refreshData(queryParams);
+        });
+        $('.statusSearch').on('click', 'span', function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            var status = $(this).attr('data');
+            var queryParams = {status: status};
+            datagrid.refreshData(queryParams);
+        });
+        //编辑需求单
+        $('#datagrid').on('click', '.handle', function () {
+            var elem = $(this).attr('data-type');
+            var row = datagrid.getSelectedRow();
+            var key = row.find('td[field=status]').attr('fieldvalue');
+            editReport(elem, key)
+        });
+        var href;
+
+        function editReport(elem) {
+            elem == 1 ?
+                href = 'NeedJhd.html'
+                :
+                href = 'printReport.html';
+            ITSOFT.itWin.open({
+                full: 'true',
+                content: href,
+                closeBtn: 0
+            })
+        }
+    });
+
+    function rolesSelectFunction(id, text) {
+        var selLi = $('#' + id).find('.ddbody').find('.dropdownul').find('li');
+        if (selLi.length == 0) {
+            $('#' + id + 'text').val('您当前没有' + text + '权限').css('color', 'red').attr('placeholder', '您当前没有' + text + '权限');
+        } else {
+            if (selLi.length > 1) {
+                var newli = '<li text="全部" value="all">全部</li>';
+                var li = $('#' + id).find('.ddbody').find('.dropdownul').html();
+                newli += li;
+                $('#' + id).find('.ddbody').find('.dropdownul').html(newli);
+            }
+        }
+    }
+</script>
+</html>

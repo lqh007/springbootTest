@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>需求上报--原料</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .itemList{
+            display: inline-block;
+            line-height: 45px;
+            margin-right: 15px;
+        }
+        .itemList .itemName{
+            font-weight: 600;
+        }
+        .detailBtn{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .detailBtn{
+            color: #fff;
+        }
+        .detailGrid{
+            max-height: 140px;
+            width: 800px!important;
+        }
+        .detailGrid .datagrid-body{
+            height: 100px!important;
+        }
+    </style>
+</head>
+<body>
+   <div class="wrap">
+     <div class="wrap-top">
+         <p style="color: #737373;float: left;">汇总上报</p>
+         <p id="closeBtn" style="float: right;"></p>
+     </div>
+     <div class="wrap-bd">
+         <div class="itsoft-toolbar">
+             <div id="toolBtn" style="float: left"></div>
+             <div style="float: left;margin-left: 100px">
+                 <div class="itemList">
+                     <span class="itemName">供应日期：</span>
+                     <span>2018-05-12</span>
+                 </div>
+                 <div class="itemList">
+                     <span class="itemName">汇总类型：</span>
+                     <span>按餐厅原料汇总</span>
+                 </div>
+                 <div class="itemList">
+                     <span class="itemName">原料类别：</span>
+                     <span>全部授权类别</span>
+                 </div>
+             </div>
+         </div>
+         <div class="itsoft-datagrid" style="border-top: 0">
+             <div id="datagrid"></div>
+         </div>
+     </div>
+   </div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var datagridYl;
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+      //关闭按钮
+      $('#closeBtn').toolbarbtn({
+        btn:[
+          {
+            text:'',
+            title:'关闭',
+            width:'35px',
+            icon:'iconfont-close',
+            click:function () {
+              parent.ITSOFT.itWin.close(index);
+            }
+          }
+        ]
+      });
+     $('#toolBtn').toolbarbtn({
+       btn:[
+         {
+           text:'删除',
+           title:'删除',
+           icon:"iconfont-del2",
+           click:function () {
+             delRow()
+           }
+         },
+         {
+           text:'保存',
+           title:'保存',
+           icon:"iconfont-save",
+           click:function () {
+             saveRow()
+           }
+         },
+         {
+           text:'提交审批',
+           title:'提交审批',
+           width:'120',
+           icon:"iconfont-fabu",
+           click:function () {
+              submitRow()
+           }
+         }
+       ]
+     });
+
+     //列表
+    datagridYl=$('#datagrid').datagrid({
+       keyField: "orderid",
+       page:true,
+       url: '../../../../../../data/order.json',
+       type: 'GET',
+       line: "both",
+       isSequence: true,
+       singleSelect: true,
+       eventrow: false,
+       click: function() {
+
+       },
+       dblclick: function() {
+         loadPage()
+       },
+       columns:[
+         {
+           field:'id',
+           isshow:false
+         },
+         {
+           title: '原料类别',
+           field: 'YLLB',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '主食类'
+           }
+         },
+         {
+           title: '原料编码',
+           field: 'YLBM',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '101'
+           }
+         },
+         {
+           title: '原料名称',
+           field: 'YLMC',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '细竹签'
+           }
+         },
+         {
+           title: '规格',
+           field: 'GG',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return ''
+           }
+         },
+         {
+           title: '单位',
+           field: 'DW',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '包'
+           }
+         },
+         {
+           title: '库存参考',
+           field: 'CK',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '10'
+           }
+         },
+         {
+           title: '需求量',
+           field: 'XQL',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '50'
+           }
+         },
+         {
+           title: '采购量',
+           field: 'CGＬ',
+           align: "center",
+           width: '100',
+           formatter:function () {
+             return '<input class="form-control" name="" value="2" >'
+           }
+         },{
+           title: '备注',
+           field: 'remark',
+           align: "left",
+           width: '50',
+           widthfix:true,
+           formatter:function () {
+             return '<input class="form-control" name="" value="2" >'
+           }
+         },{
+           title: '明细',
+           field: 'detail',
+           align: "center",
+           width: '80',
+           formatter:function () {
+             return '<span class="iconfont detailBtn iconfont-arrow2-bottom"></span>'
+           }
+         }
+       ]
+
+     });
+    datagridYl.loadData()
+
+    //明细
+     $('#datagrid').on('click','.detailBtn',function () {
+       $(document).find('.detailTr').hide();
+//       $(document).find('.detailBtn').removeClass('iconfont-arrow2-top down');
+       var key=$(this).parents('tr').attr('keyvalue');
+       var $tr='<tr class="detailTr">' +
+         '<td colspan="11" style="height: auto">' +
+         '<div id="'+key+'" class="detailGrid" style="border: 1px solid #ccc;margin: 5px"></div>' +
+         '</td>' +
+         '</tr>';
+       if($(this).hasClass('open')){
+         if($(this).hasClass('down')){
+           $(this).parents('tr').next('tr').slideUp(100);
+           $(this).removeClass('down iconfont-arrow2-top')
+         }else {
+           $(this).parents('tr').next('tr').slideDown(100);
+           $(this).addClass('down  iconfont-arrow2-top')
+         }
+       }else {
+         $(this).parents('tr').after($tr);
+         $(this).addClass('open iconfont-arrow2-top down');
+         var detailGrid=$('#'+key).datagrid({
+           keyField: "orderid",
+           page:false,
+           url: '../../../../../../data/order.json',
+           type: 'GET',
+           line: "both",
+           isSequence: true,
+           singleSelect: true,
+           eventrow: false,
+           click: function() {
+
+           },
+           dblclick: function() {
+             loadPage()
+           },
+           columns:[
+             {
+               field:'id',
+               isshow:false
+             },
+             {
+               title: '需求单位',
+               field: 'XQDW',
+               align: "center",
+               width: '100',
+               formatter:function () {
+                 return '主食类'
+               }
+             },
+             {
+               title: '需求数量',
+               field: 'XQSL',
+               align: "center",
+               width: '100',
+               formatter:function () {
+                 return '主食类'
+               }
+             },
+             {
+               title: '原料备注',
+               field: 'remark',
+               align: "left",
+               width: '100',
+               widthfix:true,
+               formatter:function () {
+                 return '主食类'
+               }
+             }
+           ]
+         });
+         detailGrid.loadData();
+       }
+      
+
+     });
+
+      //删除
+      function delRow() {
+        var row=parent.datagridIndex.getSelectedRow();
+        var msg='确定要删除吗？'
+        ITSOFT.itWin.confirm(msg,function () {
+          parent.datagridIndex.deleteRow(row.attr('keyvalue'))
+          parent.ITSOFT.itWin.close(index)
+        })
+      }
+
+      //保存
+      function saveRow(){
+        var row=parent.datagridIndex.getSelectedRow();
+        var msg='确定要保存吗？'
+        ITSOFT.itWin.confirm(msg,function () {
+          parent.ITSOFT.itWin.close(index)
+        })
+      }
+
+      //提交审批
+      function submitRow() {
+        var row=parent.datagridIndex.getSelectedRow();
+        var msg='确定要提交吗？'
+        ITSOFT.itWin.confirm(msg,function () {
+          parent.ITSOFT.itWin.close(index)
+        })
+      }
+
+
+  })
+</script>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>添加餐厅</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/webuploader-0.1.5/webuploader.css" th:href="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/webuploader.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/webuploader-0.1.5/updatefile.css" th:href="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/updatefile.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrap{
+            margin: 10px 0 0 15px;
+            height: 490px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .edui-editor-iframeholder{
+            height: 120px!important;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 280px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+        .control-label{
+            width: 100px;
+        }
+        .point{
+            color: red;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+  <div class="wrap">
+      <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningRestaurant/insertOrUpdateDiningRestaurant'}" method="post" th:object="${restaurant}">
+          <input type="hidden" name="id" th:value="${restaurant.id}">
+          <div class="form-group row">
+              <label class="control-label"><i class="point">*</i>餐厅名称：</label>
+              <div style="width: 280px;position: relative">
+                  <input type="text" name="name" th:value="${restaurant.name}" class="form-control" placeholder="请输入" onblur="generateSpell()">
+              </div>
+              <label class="control-label">拼音码：</label>
+              <div style="width: 280px">
+                  <input type="text" name="spell" th:value="${restaurant.spell}" readonly="readonly" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label"><i class="point">*</i>排序号：</label>
+              <div style="width: 280px;position: relative">
+                  <input type="text" name="number" th:value="${restaurant.number}" class="form-control" placeholder="请输入">
+              </div>
+              <label class="control-label">坐标地址：</label>
+              <div style="width: 280px">
+                  <input type="text" name="coordinateAddress" th:value="${restaurant.coordinateAddress}" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label">负责人：</label>
+              <div style="width: 280px">
+                  <input type="text" name="person" th:value="${restaurant.person}" class="form-control" placeholder="请输入">
+              </div>
+              <label class="control-label">联系电话：</label>
+              <div style="width: 280px;position: relative">
+                  <input type="text" name="contactNumber" th:value="${restaurant.contactNumber}" class="form-control isTel" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label">地址：</label>
+              <div style="width: 660px">
+                  <input type="text" name="address" th:value="${restaurant.address}" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row" style="height: auto">
+              <label class="control-label">餐饮图片：</label>
+              <div style="width: 500px">
+                  <div class="uploadimgbox">
+                      <div id="adviceImglist" class="updateImglist" style="height: 56px">
+                          <ul>
+                              <li th:each="img,iterStat : ${imgList}">
+                                  <div class="delimg" style="display: none;">×</div>
+                                  <img th:id="'img'+${iterStat.index}" th:src="${staticUploadUrl}+${img}" style="width: 89.6px; height: 56px;">
+                              </li>
+                          </ul>
+                      </div>
+                      <div id="uploadimgmore" class="uploadimg">
+                          <div class="picker" id="pickermore"></div>
+                          <input type="hidden" class="imgUrl" name="restaurantImages" th:value="${restaurant.restaurantImages}" id="imgUrl"/>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group row">
+              <div style="width:765px;padding-left: 20px;height: 120px">
+                  <textarea id="editor" type="text/plain" style="width:100%;height:100px;" name="remarks" th:text="${restaurant.remarks}"></textarea>
+              </div>
+          </div>
+      </form>
+      <div class="btnBox">
+          <div>
+              <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+              <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+          </div>
+      </div>
+  </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/webuploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/webuploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.imgResizeH.js" th:src="@{${root}+'/itsoftui/plugins/jquery.imgResizeH.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/ueditor1_4_3_3/ueditor.config.js" th:src="@{${root}+'/itsoftui/plugins/ueditor1_4_3_3/ueditor.config.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/ueditor1_4_3_3/ueditor.all.min.js" th:src="@{${root}+'/itsoftui/plugins/ueditor1_4_3_3/ueditor.all.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/ueditor1_4_3_3/lang/zh-cn/zh-cn.js" th:src="@{${root}+'/itsoftui/plugins/ueditor1_4_3_3/lang/zh-cn/zh-cn.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/pinyinjs/dict/pinyin_dict_firstletter.js" th:src="@{${root}+'/itsoftui/plugins/pinyinjs/dict/pinyin_dict_firstletter.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/pinyinjs/pinyinUtil.js" th:src="@{${root}+'/itsoftui/plugins/pinyinjs/pinyinUtil.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var staticUploadUrl = '[[${staticUploadUrl}]]';
+    var isSave = false;
+    var loadingindex;
+  $(function () {
+    //上传照片
+    $("#uploadimgmore").uploader({
+      pick: "#pickermore",
+      list: "#imgUrl",
+      type: 1,
+      ismore: 1,
+      server: "[[${staticUploadServerUrl}]]",
+      formData: {
+          system:"dining",
+          compress:"yes",                     //是否需要压缩(true:压缩;false:不压缩)
+          widthScale:0.5,                          //宽度缩放比例(填写0-1的保留一位的小数,不允许为0)
+          heightScale:0.5,                         //高度缩放比例(填写0-1的保留一位的小数,不允许为0)
+          fileType:'image'
+      },
+      success: function(r) {
+        var imgurls = $("#imgUrl").val();
+        if(!!imgurls) {
+          imgurls = imgurls.split(",");
+          if(imgurls.length > 0) {
+            var $li, $delImg, $img;
+            $("#adviceImglist ul").html("");
+            $.each(imgurls, function(i,o) {
+              oName = o;
+              $li = $("<li/>");
+              $delImg = $('<div/>').addClass("delimg").text("×");
+              $img = $("<img  id='img"+i+"'/>").attr("src", staticUploadUrl+o);
+              $li.append($delImg).append($img);
+              $("#adviceImglist ul").append($li);
+
+              $("#imgUrl").loadthumb({
+                imgId: "img"+i,
+                parentId: "adviceImglist",
+                src: staticUploadUrl+o
+              });
+            });
+          }
+        }
+        var len = $("#adviceImglist>ul>li").length;
+        if (len>=6){
+          $(".uploadimg").hide();
+        }
+      }
+    });
+//        全屏查看图片
+    $(document).on("click", ".updateImglist li", function(ev) {
+      var target = ev.target||ev.srcElement;
+      var url = $(this).find('img').attr('src');
+      if(target.nodeName.toLowerCase() != "div"){
+        window.open(url,'newWin');
+      }
+    });
+    //删除上传照片
+    $(document).on("mouseover", ".updateImglist li", function() {
+      $(this).find(".delimg").show();
+    }).on("mouseleave", ".updateImglist li", function() {
+      $(this).find(".delimg").hide();
+    }).on("click", ".updateImglist li .delimg", function() {
+      //删除上传照片
+      var $li = $(this).parent();
+      var imgurls = $(".imgUrl").val();
+      if(!!imgurls) {
+        imgurls = imgurls.split(",");
+        if(imgurls.length > 0) {
+          imgurls.splice($li.index(), 1);
+        }
+        imgurls = imgurls.join(",");
+        $(".imgUrl").val(imgurls);
+      }
+      $li.remove();
+        $(".uploadimg").show();
+    });
+
+    //编辑器
+    var editor = UE.getEditor('editor',function () {
+      autoHeight: true
+    });
+
+
+    //验证
+      $("#addform").validate({
+          rules: {
+              number: {
+                  required: true,
+                  isIntGtZero:true
+              },
+              name: {
+                  required: true
+              }
+          },
+          messages: {
+              number: {
+                  isIntGtZero:"请输入正确的排序号"
+              },
+          },
+          onkeyup: false,
+          focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+          success: "valid",
+          submitHandler: function(form) {
+              $(form).ajaxSubmit({
+                  beforeSend: function () {
+                      if (isSave) {
+                          parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                          return false;
+                      }
+                      isSave = true;
+                      loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+                  },
+                  success:function(data){
+                      //提交成功后
+                      isSave = false;
+                      parent.ITSOFT.itWin.close(loadingindex);
+                      if(data.errorCode==0){
+                          if(data.data.type == "add"){
+                              parent.lDatagrid.insertRow(data.data.obj);
+                              parent.ITSOFT.tools.showMsg("ok",data.message);
+                              $('#checkbox').iCheck('uncheck');
+                              $('#checkbox').parent('.icheckbox-blue').removeClass('checked');
+                              document.getElementById("addform").reset();
+                              $('#adviceImglist').find('ul').empty();
+                              $('#imgUrl').val('');
+                              editor.setContent("");
+                          }else {
+                              parent.lDatagrid.editRow(data.data.obj);
+                              parent.ITSOFT.tools.showMsg("ok",data.message);
+                              parent.ITSOFT.itWin.close(index);
+                          }
+                      }else{
+                          parent.ITSOFT.tools.showMsg("error",data.message);
+                      }
+                  },
+                  error:function(){
+                      isSave = false;
+                      parent.ITSOFT.itWin.close(loadingindex);
+                      parent.ITSOFT.tools.showMsg("error", "提交失败")
+                  }
+              });
+          }
+      });
+      $("#btn-ok").on('click', function(event) {
+          var remarks = editor.getContent();
+          console.log(remarks);
+          if (remarks.length > 2800){
+              parent.ITSOFT.tools.showMsg("error", "餐厅描述不能超过2800字");
+              return false;
+          }
+          $("#addform").submit();
+      });
+      $("#btn-cancel").on('click', function(event) {
+          parent.ITSOFT.itWin.close(index)
+      });
+
+
+  })
+    function generateSpell() {
+        $('[name="spell"]').val(pinyinUtil.getFirstLetter($('[name="name"]').val()));
+    }
+</script>
+</html>

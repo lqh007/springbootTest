@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>库房管理</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">系统管理->库房管理</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+       <div class="itsoft-panel">
+           <div class="itsoft-toolbar">
+               <div id="toolBtn"></div>
+               <div id="toolSelect" style="float: right"></div>
+           </div>
+           <div class="itsoft-datagrid" style="border-top: 0">
+               <div id="datagrid"></div>
+           </div>
+       </div>
+    </div>
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    var loadingindex;
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:"刷新",
+                    title:'刷新',
+                    icon:'iconfont-huanyipi',
+                    click:function () {
+                         datagrid.loadData(0)
+                    }
+                },{
+                  text:'添加',
+                  title:'添加',
+                  icon:"iconfont-add",
+                  click:function () {
+                        addRow()
+                  }  
+                },
+                {
+                  text:'编辑',
+                  title:'编辑',
+                  icon:"iconfont-edit",
+                  click:function () {
+                         editRow()
+                  }
+                },
+                {
+                  text:'删除',
+                  title:'删除',
+                  icon:"iconfont-del2",
+                  click:function () {
+                     delRow()
+                  }
+                }
+            ]
+        });
+    //搜索
+      $('#toolSelect').toolbarsearch({
+         width:'200px',
+         placeholder:'简称/名称',
+         searchEvent:function (val) {
+             var queryParams = {searchValue:val};
+            //console.log(queryParams);
+             datagrid.refreshData(queryParams);
+         } 
+      });
+    datagrid = $('#datagrid').datagrid({
+        keyField: "id",
+        page:true,
+        url: '[[${root}]]/api/v2/dining/manage/diningWarehouse/diningWarehouseList',
+        type: 'post',
+        line: "both",
+        isSequence: true,
+        singleSelect: false,
+        eventrow: false,
+        click: function() {
+
+        },
+        dblclick: function() {
+            editRow()
+        },
+        columns:[
+            {
+                field:'id',
+                isshow:false
+            },
+            {
+                title: '名称',
+                field: 'name',
+                align: "center",
+                width: '100',
+                formatter:function () {
+                }
+            },{
+                title: '简称',
+                field: 'number',
+                align: "center",
+                width: '120',
+                formatter:function () {
+                }
+            },
+            {
+                title: '类型',
+                field: 'typeName',
+                align: "center",
+                width: '100',
+                formatter:function () {
+                }
+            },
+            {
+                title: '汇总方式',
+                field: 'summaryName',
+                align: "center",
+                width: '100',
+                formatter:function () {
+                }
+            },
+            {
+                title: '负责人',
+                field: 'personName',
+                align: "center",
+                width: '100',
+                formatter:function () {
+                }
+            },
+            {
+                title: '负责人电话',
+                field: 'contactNumber',
+                align: "center",
+                width: '130',
+                formatter:function () {
+                }
+            },
+            {
+                title: '加价比例%',
+                field: 'priceIncreaseRatio',
+                align: "center",
+                width: '100',
+                formatter:function (v,i,r) {
+                    return v + '%';
+                }
+            },
+            {
+                title: '编辑人',
+                field: 'updateUser',
+                align: "center",
+                width: '100',
+                formatter:function () {
+                }
+            },
+            {
+                title: '编辑时间',
+                field: 'updateTime',
+                align: "center",
+                width: '130',
+                formatter:function (v,i,r) {
+                    if (!!v){
+                        return ITSOFT.tools.dateFormat(v,2);
+                    }else{
+                        return '';
+                    }
+                }
+            },
+            {
+                title: '备注',
+                field: 'remarks',
+                align: "left",
+                width: '100',
+                widthfix:true,
+                formatter:function () {
+                }
+            },
+        ]
+    });
+    datagrid.loadData(0);
+
+    //添加
+     function addRow() {
+           ITSOFT.itWin.open({
+               title:'添加',
+               area:['800px','400px'],
+               content:['[[${root}]]/redirect/system/addWarehouse','no']
+           })
+        }
+    //编辑
+     function editRow() {
+         var selectedRows = datagrid.getSelectedRow();
+         var id = datagrid.getColumn(selectedRows,'id');
+         if (selectedRows.length == 0) {
+             ITSOFT.tools.showMsg("error", "请选择要编辑的行");
+             return false;
+         }
+           ITSOFT.itWin.open({
+               title:'编辑',
+               area:['800px','400px'],
+               content:['[[${root}]]/redirect/system/addWarehouse?id='+id,'no']
+           })
+        }
+        //删除数据
+        function delRow() {
+            //获取选中行
+            var selectedRows = datagrid.getSelectedRows();
+            if(selectedRows.length == 0) {
+                ITSOFT.tools.showMsg("error", "请选择要删除的行");
+                return false;
+            }
+            var msgtxt = "确定要删除";
+            if(selectedRows.length > 1) {
+                msgtxt += "[选择的" + selectedRows.length + "条数据]吗？";
+            } else {
+                //提示字段要修改
+                msgtxt += "[" + datagrid.getColumnText(selectedRows[0], "name") + "]吗？";
+            }
+            ITSOFT.itWin.confirm(msgtxt, function() {
+                //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningWarehouse/deleteDiningWarehouse',
+                    type: 'post',
+                    data: {ids:selectedRows},
+                    async: false,
+                    beforeSend: function () {
+                        loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success: function (data) {
+                        ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            ITSOFT.tools.showMsg("ok", "已删除");
+                            $(selectedRows).each(function(i,val) {
+                                //执行成功后删除datagrid数据
+                                datagrid.deleteRow(val);
+                            });
+                        } else {
+                            ITSOFT.tools.showMsg("error", data.message);
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                        ITSOFT.tools.showMsg("error", data.message);
+                    },
+                    complete: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                    }
+                });
+            });
+        }
+
+
+
+    });
+</script>
+</html>

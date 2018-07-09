@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>库存</title>
+    <link rel="stylesheet" href="../../../../../common/css/nav-page.css" />
+    <link rel="stylesheet" href="../../../../../itsoftui/css/itsoftui.css" />
+    <style>
+        .page {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            background-color: #f0f4f7;
+        }
+        #txt{
+            font-size: 16px;
+            color: #31507E;
+        }
+        .page-right{
+            width: 300px;
+            height: 100%;
+            float: right;
+            background-color: #fff;
+        }
+        .page-left{
+            margin-right: 310px;
+            padding-left: 25px;
+            height: 100%;
+            padding-top:50px;
+            background-color:#fff ;
+            overflow-y: auto;
+        }
+        .onCls{
+            color: #1094FA;
+        }
+         .itemTop{
+             height: 45px;
+             line-height: 45px;
+             padding-left: 15px;
+             font-size: 16px;
+             background-color: #649bd3;
+             color: #fff;
+             box-shadow: 0px 2px 5px #ccc;
+             margin-bottom: 10px;
+         }
+         .itemBd p{
+             height: 40px;
+             line-height: 40px;
+             padding-left: 15px;
+         }
+        .seticon{
+            /*background-image: url("../../../../../common/img/root.png");*/
+            background-repeat: no-repeat;
+        }
+        .icon-xsxx {
+            background-position: 0px 0;
+        }
+        .icon-xszt {
+            background-position: -41px 0;
+        }
+        .icon-pycc {
+            background-position: -80px 0;
+        }
+        .icon-lygl {
+            background-position: -120px 0;
+        }
+        .icon-lcgl {
+            background-position: -162px 0;
+        }
+        .icon-fjgl {
+            background-position: -203px 0;
+        }
+        .icon-cwgl {
+            background-position: -245px 0;
+        }
+        .icon-fjyt {
+            background-position: -287px 0;
+        }
+        .icon-xtcs {
+            background-position: -328px 0;
+        }
+        .icon-shlc {
+            background-position: -369px 0;
+        }
+        .icon-sjzd {
+            background-position: -410px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="page-right">
+        <div class="itemTop">库存相关报表 </div>
+        <div class="itemBd">
+            <p>
+                <a href="javascript:;">
+                    库存分布明细报表
+                </a>
+            </p>
+            <p>
+                <a href="javascript:;">
+                    库存收发存汇总表（中心）
+                </a>
+            </p>
+            <p>
+                <a href="javascript:;">
+                    库房出入日记账
+                </a>
+            </p>
+            <p>
+                <a href="javascript:;">
+                    加工入库明细表
+                </a>
+            </p>
+            <p>
+                <a href="javascript:;">
+                    库房收发存汇总表
+                </a>
+            </p>
+        </div>
+    </div>
+    <div class="page-left">
+        <div style="margin-bottom: 80px">
+            <ul class="clearfix">
+                <li>
+                    <a href='javascript:;' sls-href='CgRk/index.html'>
+                        <p class="seticon icon-xsxx"></p>
+                        <p class="navname">原料供应商</p>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript:;' sls-href='Ylck/index.html'>
+                        <p class="seticon icon-xsxx"></p>
+                        <p class="navname">原料仓库</p>
+                    </a>
+                </li>
+            </ul>
+            <ul class="clearfix">
+                <li>
+                    <a href='javascript:;' sls-href='CgTk/index.html'>
+                        <p class="seticon icon-xsxx"></p>
+                        <p class="navname">加工入库</p>
+                    </a>
+                </li>
+                <li>
+                    <a href='javascript:;' sls-href='Cgjs/index.html'>
+                        <p class="seticon icon-xsxx"></p>
+                        <p class="navname">加工出库</p>
+                    </a>
+                </li>
+                <li class="left-menu-first">
+                    <a href="javascript:;" sls-href="supplierHzb_zb.html">
+                        <p class="seticon icon-xtgl"></p>
+                        <p class="navname">库房盘点</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../itsoftui/plugins/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../../../../itsoftui/plugins/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../../../../itsoftui/js/itsoftui.js" type="text/javascript" charset="utf-8"></script>
+<script>
+
+    $(function(){
+        $('.page').find('li').on('mouseenter',function(){
+            $(this).addClass('li_color');
+            $(this).find('.navname').addClass('t_color');
+            $(this).find('.seticon').animate({
+                'background-position-y':-41
+            },200)
+        })
+        $('.page').find('li').on('mouseleave',function(){
+            $(this).removeClass('li_color');
+            $(this).find('.navname').removeClass('t_color');
+            $(this).find('.seticon').animate({
+                'background-position-y':0
+            },200)
+        });
+
+        $('.page').on('click','li',function(){
+            var href=$(this).find('a').attr('sls-href');
+            ITSOFT.itWin.open({
+                full:true,
+                content:[href,'no'],
+                closeBtn:0
+            })
+
+        });
+
+        /********
+         统计js
+         **********/
+
+        $('.pageTj').find('p').hover(function(){
+            $(this).find('span').addClass('onCls')
+
+        },function(){
+            $(this).find('span').removeClass('onCls')
+
+        });
+
+        $('.pageTj').on('click','p',function(){
+
+            var href=$(this).find('a').attr('sls-href');
+            ITSOFT.itWin.open({
+                full:true,
+                content:[href,'no'],
+                closeBtn:0
+            })
+        })
+    })
+</script>
+</html>
+

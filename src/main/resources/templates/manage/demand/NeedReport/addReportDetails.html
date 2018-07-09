@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>选择原料</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css" th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .itsoftLt{
+            width: 200px;
+            float: left;
+        }
+        .itsoftRt{
+            margin-left: 205px;
+        }
+        .choseBtn div{
+            margin-top: 5px;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 4px;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        .outBtn{
+            border: 1px solid #2e8ded;
+            color: #2e8ded;
+        }
+        .sureBtn{
+            background-color: #2e8ded;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10">
+       <div class="itsoftLt">
+            <div class="itsoft-tree" id="selectTree"></div>
+       </div>
+       <div class="itsoftRt">
+           <div class="itsoft-toolbar">
+               <div id="toolSearch" style="float: left"></div>
+               <div style="float: left;margin: 0 20px;line-height: 45px;color: #aa1111">
+                   <span id="choseNum">0</span>
+                   <span style="color: #aa1111">条被选中</span>
+               </div>
+               <div class="choseBtn" style="float: right">
+                   <div class="outBtn" id="outBtn">取消</div>
+                   <div class="sureBtn" id="sureBtn">确定</div>
+               </div>
+           </div>
+           <div  id="datgrid" style="border-top:0 ; float: right; "> </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    var typeName = '';
+    $(function () {
+        var selectedMaterial = parent.selectedMaterial;
+        parent.selectedMaterial = '';
+        var tree = $("#selectTree").itsofttree({
+            url:'[[${root}]]/api/v2/dining/manage/diningMaterialType/diningMaterialTypeTreeList',
+            type: "post",
+            root: ['root','所有类型'], //根节点 如['root','根节点']
+            click:function (val,text) {
+                if (typeName != val) {
+                    typeName = val;
+                    var queryParams = {};
+                    queryParams.materialTypeId = val;
+                    datagrid.refreshData(queryParams);
+                }
+            }
+        });
+
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'编码/拼音码/名称',
+            searchEvent:function (val) {
+                var queryParams = {};
+                queryParams.searchValue = val;
+               datagrid.refreshData(queryParams)
+            }
+        });
+        //取消
+        $('#outBtn').on('click',function () {
+            closeRow()
+        })
+        //确定
+        $('#sureBtn').on('click',function () {
+            addRow()
+        })
+
+     datagrid = $('#datgrid').datagrid({
+            keyField: "id",
+            page:true,
+            url: '[[${root}]]/api/v2/dining/manage/diningMaterial/warehouseMaterialSelectTable',
+            type: 'post',
+            line: "both",
+            queryParams:{warehouseId:'[[${warehouseId}]]',searchValue:'[[${materialNumber}]]',selectedMaterial:selectedMaterial},
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    field:'typeId',
+                    isshow:false
+                },
+                {
+                    title: '编码',
+                    field: 'number',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '名称',
+                    field: 'name',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'specification',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'unit',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '供应价',
+                    field: 'supplyPrice',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '保质期',
+                    field: 'warranty',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'brand',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '条码',
+                    field: 'barCode',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                    }
+                },
+                {
+                    title: '类别',
+                    field: 'materialTypeName',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                    }
+                }
+            ]
+        });
+        datagrid.loadData(0);
+
+
+        //点击确定
+        function addRow() {
+            var rows=datagrid.getSelectedRows();
+            if(rows.length==0){
+                ITSOFT.tools.showMsg('error','请选择要添加的行');
+                return false
+            }
+            var cols='[';
+            $(rows).each(function (i,keyvalue) {
+                if(i>0){
+                    cols+=',{'
+                }else {
+                    cols+='{'
+                }
+                //id
+                cols += '"materialId":"' +datagrid.getColumnText(keyvalue,"id") + '",';
+                //编码
+                cols += '"materialCode":"' +datagrid.getColumnText(keyvalue,"number") + '",';
+                //原料名称
+                cols += '"materialName":"' +datagrid.getColumnText(keyvalue,"name") + '",';
+                //原料类别Id
+                cols += '"materialTypeId":"' +datagrid.getColumnText(keyvalue,"typeId") + '",';
+                //原料类别
+                cols += '"materialTypeName":"' +datagrid.getColumnText(keyvalue,"materialTypeName") + '",';
+                //原料规格
+                cols += '"materialModule":"' +datagrid.getColumnText(keyvalue,"specification") + '",';
+                //原料单位
+                cols += '"materialUnit":"' +datagrid.getColumnText(keyvalue,"unit") + '",';
+                //原料备注
+                cols += '"remark":"' +datagrid.getColumnText(keyvalue,"remark") + '",';
+                //供应价
+                cols += '"price":"' +datagrid.getColumnText(keyvalue,"supplyPrice") + '",';
+                //数量
+                cols += '"number":"' +0 + '",';
+                //金额
+                cols += '"amount":"' +0 + '",';
+                //原料品牌
+                cols += '"materialBrand":"' +datagrid.getColumnText(keyvalue,"brand") + '"}';
+            });
+            cols+=']';
+            parent.insertrow( JSON.parse(cols));
+            closeRow();
+        }
+
+        //关闭页面
+        function closeRow() {
+            parent.ITSOFT.itWin.close(index)
+        }
+
+        //选中个数
+
+       $('#datgrid').on('click','.ckb-body',function () {
+         setTimeout(function () {
+           var key=$('#datgrid').find('.checked').length;
+            $('#choseNum').text(key)
+         },400)
+
+       })
+
+
+    });
+</script>
+</html>

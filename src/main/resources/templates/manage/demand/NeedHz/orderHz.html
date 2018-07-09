@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div id="datagridOrder"></div>
+</body>
+<script>
+    $(function () {
+        var datagridOrder=$('#datagridOrder').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '状态',
+                    field: 'state',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '未上报'
+                    }
+                },
+                {
+                    title: '汇总类型',
+                    field: 'HzType',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '按餐厅班组汇总'
+                    }
+                },
+                {
+                    title: '供应日期',
+                    field: 'GyTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-03'
+                    }
+                },
+                {
+                    title: '汇总时间',
+                    field: 'HzTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-06'
+                    }
+                },
+                {
+                    title: '汇总人',
+                    field: 'HzName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张一元'
+                    }
+                },
+                {
+                    title: '审核时间',
+                    field: 'ShTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-07'
+                    }
+                },
+                {
+                    title: '审核人',
+                    field: 'ShName',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '李亮'
+                    }
+                },
+                {
+                    title: '操作',
+                    field: 'rawNum',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '<span class="iconfont iconfont-edit"></span>'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return ''
+                    }
+                }
+            ]
+
+        });
+        datagridOrder.loadData()
+    })
+</script>
+</html>

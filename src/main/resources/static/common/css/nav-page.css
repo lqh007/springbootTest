@@ -1,0 +1,97 @@
+.page {
+	
+	width: 900px;
+	overflow: hidden;
+	overflow-y: auto;
+}
+
+.page ul>li {
+	width: 115px;
+	height: 110px;			
+	margin: 0 50px 15px 0;
+	/*border: 1px solid #ccc;*/
+	background: #f2f2f2;
+	cursor: pointer;
+	float: left;
+}
+.li_color{background-color: #649bd3!important;}
+.t_color{color: #fff;}
+.cont-img,.seticon {
+	width: 41px;
+	height: 41px;	
+	margin: 0 auto;	
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.navname,.cont-tit{
+	text-align: center;
+}
+.title {
+	font-size: 16px;
+	height: 50px;
+	line-height: 50px;
+}
+
+.hidemain,.glissade {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	right: -101%;
+}
+
+.ft-main {
+	/*width: 35%;*/
+	height: 100%;
+	float: left;
+}
+
+.rt-main {
+	position: relative;
+	width: 900px;
+	height: 100%;
+	float: right;
+	background-color: #fff;
+	box-shadow: 0 0 35px #000000;
+}
+
+.top-title {
+	width: 100%;
+	height: 50px;
+	background-color: #e4e9ef;
+	line-height: 48px;
+	padding: 0 20px;
+}
+
+.cont {
+	width: 900px;
+	height: 100%;
+    top:50px;
+    position:absolute;
+    padding-bottom: 50px;
+}
+
+#t-iframe {
+	width: 100%;
+	height: 100%;
+	outline: none;
+	border: 0
+}
+.back {
+	font-size: 20px;
+	cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

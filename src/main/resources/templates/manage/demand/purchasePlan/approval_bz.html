@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>审批--班组</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            margin-top: 5px;
+        }
+        .table-search-menu{
+            width: 100%!important;
+        }
+        .handle{
+            font-size: 20px;
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .detailList{
+            height:auto;
+            width: 100%;
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+        .detailList td {
+            border-right: 1px solid #ccc;
+            padding: 0 5px;
+        }
+        .detailList tr{
+            border: 1px solid #ccc;
+        }
+        .detailList .num{
+            width: 50px;
+            text-align: center;
+        }
+        .detailList .xqDw{
+            width: 150px;
+            text-align: center;
+        }
+        .detailList .xqNum{
+            width: 150px;
+            text-align: center;
+        }
+        .detailList .remark{
+            width: 400px;
+        }
+        .itemList{
+            display: inline-block;
+            line-height: 45px;
+            margin-right: 30px;
+        }
+        .itemName{
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+  <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划->采购计划</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <div id="toolBtnBh" style="float: left"></div>
+
+                <div id="toolBtn" style="float: right"></div>
+                <div style="float: right;line-height: 45px;margin-right:30px">
+                    <span>如果下拉中没有供应商，请到</span>
+                    <span><a style="color: #2e8ded">【库房原料】</a></span>
+                    <span>设置</span>
+                </div>
+            </div>
+            <div class="itsoft-toolbar" style="border-top: 0">
+               <div class="itemList">
+                   <span class="itemName">供应日期：</span>
+                   <span>2018-05-28</span>
+               </div>
+               <div class="itemList">
+                   <span class="itemName">汇总类型：</span>
+                   <span>按餐厅班组汇总</span>
+               </div>
+               <div class="itemList">
+                   <span class="itemName">原料类别：</span>
+                   <span>全部授权类别</span>
+               </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+
+        //原料驳回
+        $('#toolBtnBh').toolbarbtn({
+            btn:[
+                {
+                    text:"原料驳回",
+                    title:"原料驳回",
+                    icon:'iconfont-caiqie',
+                    width:'100',
+                    click:function () {
+                      deniedRow()
+                    }
+                }
+            ]
+        });
+        $('#toolBtn').toolbarbtn({
+            btn:[
+              {
+                text:'|'
+              },{
+                text:"批量设置供应商",
+                title:"批量设置供应商",
+                icon:'iconfont-manage2',
+                width:'140px',
+                click:function () {
+                   setGys()
+                }
+              },{
+                 text:"保存",
+                 title:"保存",
+                 icon:'iconfont-save',
+                 click:function () {
+                    saveRow()
+                 }
+                },
+                {
+                    text:"审批",
+                    title:"审批",
+                    icon:'iconfont-edit2',
+                    click:function () {
+                        auditRow()
+                    }
+                }
+            ]
+        });
+        //双日历
+        SetDateRangePicker('gyTime', function(start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
+        //列表
+         datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '餐厅名称',
+                    field: 'name',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '学子食府餐厅'
+                    }
+                },
+                {
+                    title: '需求单位',
+                    field: 'rawType',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '1号班组'
+                    }
+                },
+                {
+                    title: '原料类别',
+                    field: 'rawLb',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '低值易耗类'
+                    }
+                },
+                {
+                    title: '原料编码',
+                    field: 'rawBM',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '1023'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'rawName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '细竹签'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'specs',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '1*2m'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'unit',
+                    align: "center",
+                    width: '80',
+                    formatter:function () {
+                        return '个'
+                    }
+                },
+                {
+                    title: '库存参考',
+                    field: 'KCCK',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2'
+                    }
+                },
+                {
+                    title: '需求量',
+                    field: 'needNum',
+                    align: "center",
+                    width: '80',
+                    formatter:function () {
+                        return '6'
+                    }
+                },
+                {
+                    title: '采购量',
+                    field: 'procureNum',
+                    align: "center",
+                    width: '80',
+                    formatter:function () {
+                        return '7'
+                    }
+                },
+                {
+                    title: '供应商',
+                    field: 'supplier',
+                    align: "center",
+                    width: '200',
+                    overflow: "visible",
+                    formatter:function () {
+                        return '<input type="text" name="rawName"  readonly  value="">' +
+                               '<a class="iconfont listbtn supBtn iconfont-arrow2-bottom"></a>' +
+                               '<div class="table-search-menu"></div>';
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return '<input class="form-control" name="" value="">'
+                    }
+                },
+            ]
+        });
+        datagrid.loadData();
+
+        //供应商
+
+        $('#datagrid').on('click','.supBtn',function () {
+               var menu=$(this).next('.table-search-menu');
+               $(document).find('.table-search-menu').hide();
+               setTimeout(function () {
+                   menu.show();
+               },300);
+            menu.empty();
+            //查询数据
+            ITSOFT.dataAjax({
+                url: '../../../../../../data/material.json',
+                type: 'GET',
+                async: true,
+//                data: queryParams,
+                beforeSend: function() {},
+                success: function(res) {
+                   $.each(res.data.rows, function(i, row) {
+                       var $table = $("<ul class='table-search'/>");
+                       //id
+                       $table.append('<li  field="rawId"  style="display:none">' + row.id + '</li>');
+                       //供应商名称
+                       $table.append('<li field="rawName" style="width:178px; text-align:left;"  >' + row.name + '</li>');
+                       menu.append($table);
+                   });
+                },
+                complete: function() {
+                    $(menu).find(".loading").remove();
+                },
+                error: function() {
+                    ITSOFT.tools.showMsg("error", "数据加载失败")
+                }
+            });
+
+            $(document).on("click", ".table-search-menu ul", function(e) {
+                $(this).siblings().removeClass('currentrow').end().addClass('currentrow');
+                var curmenurow = menu.find(".currentrow");
+                if (curmenurow.length == 0) return false;
+                var id=$(this).find('li[field="rawId"]').text();
+                var val=$(this).find('li[field="rawName"]').text();
+                $(this).parents('.table-search-menu').siblings('input').val(val).attr('data-id',id)
+                menu.hide();
+            });
+
+        });
+        //点击明细
+
+        $('#datagrid').on('click','.handleBtn',function () {
+            var elem=$(this).parents('tr').next('.detailList');
+            if(elem.length>0){
+                elem.slideToggle(300);
+                $(this).parents('tr').siblings().next('.detailList').slideUp(300);
+                return false
+            }
+            var list='<div class="detailList">' +
+                        '<table>' +
+                   '<thead>' +
+                      '<tr>' +
+                       '<td class="num">序号</td>' +
+                       '<td class="xqDw">需求单位</td>' +
+                       '<td class="xqNum">需求量</td>' +
+                       '<td class="remark">备注</td>' +
+                      '</tr>'+
+                '</thead>'+
+                 '<tbody>' +
+                    '<tr>' +
+                     '<td class="num">1</td>'+
+                     '<td class="xqDw">学子食府</td>'+
+                     '<td class="xqNum">20</td>'+
+                     '<td class="remark">121212</td>'+
+                '</tr>'+
+                '</tbody>'+
+                '</table>'+
+                '</div>';
+                $(this).parents('tr').after(list);
+                $(this).parents('tr').siblings().next('.detailList').slideUp(300);
+        });
+
+        //保存
+        function saveRow() {
+          ITSOFT.itWin.confirm('确定要保存吗?',function () {
+              ITSOFT.tools.showMsg('ok','保存成功')
+          })
+        }
+        //审批
+        function auditRow() {
+            var row=datagrid.getSelectedRow();
+            var val=row.find('input').val();
+            if(row.length==0){
+                ITSOFT.tools.showMsg('error','请选择要审核的行');
+                return false
+            }
+            if(val==""){
+                ITSOFT.tools.showMsg('error','请选择供应商');
+                return false
+            }
+            ITSOFT.itWin.confirm('确定是否需要审核',function () {
+                alert(123)
+            })
+        }
+
+        //批量设置供应商
+        function  setGys() {
+          var rows=datagrid.getSelectedRows();
+          if(rows.length==0){
+            ITSOFT.tools.showMsg('error','请选择要设置供应商的行');
+            return false
+          }
+           ITSOFT.itWin.open({
+              title:'设置供应商',
+              area:['550px','350px'],
+              content:['GYS.html','no']
+           })
+        }
+
+        //驳回
+      function deniedRow() {
+          var row=datagrid.getSelectedRow();
+          if(row.length==0){
+             ITSOFT.tools.showMsg('error','请选择要驳回的行');
+             return false
+          }
+          ITSOFT.itWin.open({
+            title:'驳回',
+            area:['400px','200px'],
+            content:['rejected.html','no']
+          })
+      }
+
+    })
+    function getsupplier(v) {
+      var rows=datagrid.getSelectedRows();
+      $(rows).each(function (i,o) {
+        $('tr[keyvalue='+o+']').find('input[name=rawName]').val(v);
+      })
+    }
+</script>
+</html>

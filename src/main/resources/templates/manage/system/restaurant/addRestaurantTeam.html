@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>添加班组</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrap{
+            margin: 10px 0 0 15px;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .edui-editor-iframeholder{
+            height: 150px!important;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+        .control-label{
+            width: 100px;
+        }
+        .point{
+            color: red;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+  <div class="wrap">
+      <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningRestaurantTeam/insertOrUpdateDiningRestaurantTeam'}" method="post" >
+          <input type="hidden" name="id" th:value="${restaurantTeam.id}">
+          <input type="hidden" name="restaurantId" th:value="${restaurantTeam.restaurantId}">
+          <input type="hidden" name="restaurantName" th:value="${restaurantTeam.restaurantName}">
+          <div class="form-group row">
+              <label class="control-label"><i class="point">*</i>班组名称：</label>
+              <div style="width: 500px;position: relative">
+                  <input type="text" name="teamName" th:value="${restaurantTeam.teamName}" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label"><i class="point">*</i>排序号：</label>
+              <div style="width: 200px;position: relative">
+                  <input type="text" name="teamNumber" th:value="${restaurantTeam.teamNumber}" class="form-control" placeholder="请输入">
+              </div>
+              <label class="control-label">简称：</label>
+              <div style="width: 200px">
+                  <input type="text" name="abbreviation" th:value="${restaurantTeam.abbreviation}" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label">联系人：</label>
+              <div style="width: 200px">
+                  <input type="text" name="person" th:value="${restaurantTeam.person}" class="form-control" placeholder="请输入">
+              </div>
+              <label class="control-label">联系方式：</label>
+              <div style="width: 200px;position: relative">
+                  <input type="text" name="contactNumber" th:value="${restaurantTeam.contactNumber}" class="form-control isTel" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label">分组方式：</label>
+              <div style="width: 200px">
+                  <div class="dropdownlist" id="groupType" name="groupType"></div>
+                  <input type="hidden" id="groupingId" name="groupingId" th:value="${restaurantTeam.groupingId}">
+                  <input type="hidden" id="groupingName" name="groupingName" th:value="${restaurantTeam.groupingName}">
+              </div>
+              <label class="control-label">地址：</label>
+              <div style="width: 200px">
+                 <input type="text" name="address" th:value="${restaurantTeam.address}" class="form-control" placeholder="请输入">
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label" style="width: 150px">是否享受计划价：</label>
+              <div style="width: 400px;margin-top: 5px">
+                  <div class="check-box">
+                      <input type="checkbox" id="checkbox-1" name="plannedPrice" value="1" th:checked="${restaurantTeam.plannedPrice} eq '1'">
+                      <label for="checkbox-1" style="color: #999">勾选代表按照计划价进行供应</label>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label" style="width: 150px">是否核算：</label>
+              <div style="width: 400px;margin-top: 5px">
+                  <div class="check-box">
+                      <input type="checkbox" id="checkbox-2" name="accounting" value="1" th:checked="${restaurantTeam.accounting} eq '1'">
+                      <label for="checkbox-2" style="color: #999">是否参与餐厅经营核算</label>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label" style="width: 150px">是否库房：</label>
+              <div style="width: 400px;margin-top: 5px">
+                  <div class="check-box">
+                      <input type="checkbox" id="checkbox-3" name="storeroom" value="1" th:checked="${restaurantTeam.storeroom} eq '1'">
+                      <label for="checkbox-3" style="color: #999">勾选代表可以进行库房的相关操作</label>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label" style="width: 150px">是否允许申购：</label>
+              <div style="width: 400px;margin-top: 5px">
+                  <div class="check-box">
+                      <input type="checkbox" id="checkbox-4" name="apply" value="1" th:checked="${restaurantTeam.apply} eq '1'">
+                      <label for="checkbox-4" style="color: #999">勾选代表可以进行需求计划的上报</label>
+                  </div>
+              </div>
+          </div>
+          <div class="form-group row">
+              <label class="control-label">备注：</label>
+              <div style="width: 500px;margin-top: 5px">
+                 <textarea name="remarks" th:text="${restaurantTeam.remarks}" class="form-control" style="height: 80px"></textarea>
+              </div>
+          </div>
+
+      </form>
+      <div class="btnBox">
+          <div>
+              <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+              <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+          </div>
+      </div>
+  </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" type="text/javascript" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/webuploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/webuploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.imgResizeH.js" th:src="@{${root}+'/itsoftui/plugins/jquery.imgResizeH.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var isSave = false;
+    var loadingindex;
+  $(function () {
+
+    $('.check-box input').iCheck({
+      checkboxClass: 'icheckbox-blue',
+      radioClass: 'iradio-blue',
+      increaseArea: '20%'
+    })
+    //分组方式
+    $('#groupType').dropdownlist({
+        type:'post',
+        dataurl:'[[${root}]]/api/v2/dining/manage/systemConfiguration/getDbBookListByParentId?id=201708270022',
+        width:'198px',
+        selectValue: "[[${restaurantTeam.groupingId}]]", //选中的值
+        selectText: "[[${restaurantTeam.groupingName}]]", //选中的值
+        placeholder:'请选择',
+        changeEvent:function (val,text) {
+            $('#groupingId').val(val);
+            $('#groupingName').val(text);
+        }
+    });
+
+    //验证
+      $("#addform").validate({
+          rules: {
+              teamNumber: {
+                  required: true,
+                  isIntGtZero:true
+              },
+              teamName: {
+                  required: true
+              }
+          },
+          onkeyup: false,
+          focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+          success: "valid",
+          submitHandler: function(form) {
+              $(form).ajaxSubmit({
+                  beforeSend: function () {
+                      if (isSave) {
+                          parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                          return false;
+                      }
+                      isSave = true;
+                      loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+                  },
+                  success:function(data){
+                      //提交成功后
+                      isSave = false;
+                      parent.ITSOFT.itWin.close(loadingindex);
+                      if(data.errorCode==0){
+                          if(data.data.type == "add"){
+                              parent.rDatagrid.insertRow(data.data.obj);
+                              parent.ITSOFT.tools.showMsg("ok",data.message);
+                              $('input[type=checkbox]').iCheck('uncheck');
+                              $('input[type=checkbox]').parent('.icheckbox-blue').removeClass('checked');
+                              $('#groupingId').val('');
+                              $('#groupingName').val('');
+                              document.getElementById("addform").reset();
+                          }else {
+                              parent.rDatagrid.editRow(data.data.obj);
+                              parent.ITSOFT.tools.showMsg("ok",data.message);
+                              parent.ITSOFT.itWin.close(index);
+                          }
+                      }else{
+                          parent.ITSOFT.tools.showMsg("error",data.message);
+                      }
+                  },
+                  error:function(){
+                      isSave = false;
+                      parent.ITSOFT.itWin.close(loadingindex);
+                      parent.ITSOFT.tools.showMsg("error", "提交失败")
+                  }
+              });
+          }
+      });
+      $("#btn-ok").on('click', function(event) {
+          $("#addform").submit();
+      });
+      $("#btn-cancel").on('click', function(event) {
+          parent.ITSOFT.itWin.close(index)
+      });
+
+
+  })
+</script>
+</html>

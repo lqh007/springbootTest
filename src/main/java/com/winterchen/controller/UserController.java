@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserService userService;
+/*
 
     @RequestMapping
-    @ResponseBody
     public String index(){
-        return "hello";
+        return "manage/index";
     }
+*/
 
     @ResponseBody
     @PostMapping("/add")

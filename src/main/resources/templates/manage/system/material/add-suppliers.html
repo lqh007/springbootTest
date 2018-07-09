@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit" />
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>供应商</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}"/>
+</head>
+<body>
+   <div class="pd-10" style="width: 400px">
+       <div class="itsoft-toolbar">
+           <div id="toolBtn" style="float: left;"></div>
+           <div id="toolSearch" style="float: right"></div>
+       </div>
+       <div class="itsoft-datagrid" id="datagrid" style="border-top: 0"></div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.min.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var datagrid;
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+        var supplyIdListStr = parent.supplyIdListStr;
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'加入',
+                    title:'加入',
+                    icon:'iconfont-add',
+                    click:function () {
+                          add()
+                    }
+                }
+            ]
+        });
+
+        $('#toolSearch').toolbarsearch({
+            width:'200px',
+            placeholder:'供应商名称',
+            searchEvent:function (val) {
+                var search={
+                    searchValue:val
+                };
+                datagrid.refreshData(search)
+            }
+        });
+
+        //列表
+
+        datagrid=$('#datagrid').datagrid({
+            keyField: "supplyId",
+            page:false,
+            url: '[[${root}]]/api/v2/dining/manage/diningSupplier/diningSupplierSelectList',
+            type: 'post',
+            line: "both",
+            queryParams:{supplyIdListStr:supplyIdListStr},
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+                {
+                    field:'supplyId',
+                    isshow:false
+                },{
+                    title: '供应商名称',
+                    field: 'supplyName',
+                    align: "center",
+                    width: '200',
+                    widthfix:true,
+                },
+
+            ]
+        });
+        datagrid.loadData(0);
+
+        //加入
+
+        function add() {
+            var row=datagrid.getSelectedRows();
+            if(row.length==0){
+                parent.ITSOFT.tools.showMsg('error','请选择供应商');
+                return false
+            }
+            var col='[';
+            $(row).each(function (i,keyvalue) {
+                if(i==0){
+                    col+='{'
+                }else {
+                    col+=',{'
+                }
+                col+='"supplyId":"'+datagrid.getColumnText(keyvalue,"supplyId")+'",';
+                col+='"supplyName":"'+datagrid.getColumnText(keyvalue,"supplyName")+'"';
+                col+='}'
+
+            });
+                col+=']';
+             col=JSON.parse(col);
+            $.each(col,function (i,o) {
+                parent.supplyGrid.insertRow(o)
+            })
+             parent.ITSOFT.itWin.close(index);
+        }
+
+
+
+
+    })
+</script>
+</html>

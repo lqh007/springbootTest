@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>添加卡机</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css"
+          th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css"
+          th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css"
+          th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="itsoft-panel">
+        <div class="itsoft-toolbar">
+            <div id="toolBtn" style="float: left"></div>
+        </div>
+        <div id="datagrid"></div>
+    </div>
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js"
+        th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js"
+        th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var datagrid;
+    var loadingindex;
+    var index = parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //按钮
+        $('#toolBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '刷新',
+                    title: '刷新',
+                    icon: 'iconfont-huanyipi',
+                    click: function () {
+                        datagrid.loadData(0)
+                    }
+                }, {
+                    text: '添加',
+                    title: '添加',
+                    icon: 'iconfont-add',
+                    click: function () {
+                        addRow()
+                    }
+                }
+            ]
+        });
+
+        //列表
+        datagrid = $('#datagrid').datagrid({
+            keyField: "id",
+            page: false,
+            url: '[[${root}]]/api/v2/dining/manage/diningRestaurantCard/diningRestaurantCardList',
+            queryParams: {teamId: '[[${teamId}]]'},
+            type: 'post',
+            line: "both",
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function () {
+
+            },
+            dblclick: function () {
+
+            },
+            columns: [
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '卡机名称',
+                    field: 'name',
+                    align: "left",
+                    width: '150',
+                    formatter: function () {
+
+                    }
+                },
+                {
+                    title: '卡机编号',
+                    field: 'number',
+                    align: "center",
+                    width: '100',
+                    formatter: function () {
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remarks',
+                    align: "left",
+                    width: '150',
+                    widthfix: true,
+                    formatter: function () {
+                    }
+                },
+            ]
+        });
+        datagrid.loadData(0)
+
+        //添加
+        function addRow() {
+            var rows = datagrid.getSelectedRows();
+            if (rows.length == 0) {
+                parent.ITSOFT.tools.showMsg('error', '请选择要添加的行');
+                return false
+            }
+            var msgtxt = "确定要添加";
+            if(rows.length > 1) {
+                msgtxt += "[选择的" + rows.length + "条数据]吗？";
+            } else {
+                //提示字段要修改
+                msgtxt += "[" + datagrid.getColumnText(rows[0], "name") + "]吗？";
+            }
+            ITSOFT.itWin.confirm(msgtxt, function() {
+                //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningRestaurantCard/addDiningRestaurantCard',
+                    type: 'post',
+                    data: {ids:rows,teamId:'[[${teamId}]]'},
+                    async: false,
+                    beforeSend: function () {
+                        loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success: function (data) {
+                        parent.ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            parent.ITSOFT.tools.showMsg("ok", data.message);
+                            parent.datagrid.refreshData();
+                            parent.ITSOFT.itWin.close(index);
+                        } else {
+                            parent.ITSOFT.tools.showMsg("error", data.message);
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                        ITSOFT.tools.showMsg("error", data.message);
+                    },
+                    complete: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                    }
+                });
+            });
+        }
+
+    })
+</script>
+</html>

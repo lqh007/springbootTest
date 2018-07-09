@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>已汇总操作</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        label{
+            font-weight: 400;
+            margin-right: 50px;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10 wrap">
+       <div class="wrap-top">
+           <p style="color: #737373;float: left;">需求计划->需求汇总</p>
+           <p id="closeBtn" style="float: right;"></p>
+       </div>
+       <div class="wrap-bd">
+           <div class="itsoft-panel">
+               <div class="itsoft-toolbar">
+                  <div id="toolBtn"></div>
+               </div>
+               <div class="itsoft-toolbar" style="border-top:0;line-height: 45px">
+                   <label>
+                       <span>供应日期：</span>
+                       <span>2018-03-06</span>
+                   </label>
+                   <label>
+                       <span>汇总类型：</span>
+                       <span>按餐厅班组汇总</span>
+                   </label>
+               </div>
+               <div class="itsoft-datagrid" id="datagrid" style="border-top: 0"> </div>
+           </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    $(function () {
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                text:'删除',
+                title:'删除',
+                icon:'iconfont-del2',
+                click:function () {
+
+                }
+                },
+                {
+                text:'保存',
+                title:'保存',
+                icon:'iconfont-fabu',
+                click:function () {
+
+                }
+                },
+                {
+                text:'审批',
+                title:'审批',
+                icon:'iconfont-edit2',
+                click:function () {
+
+                }
+                }
+            ]
+        });
+
+        //列表
+        var datagrid=$('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '需求单位',
+                    field: 'state',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '未上报'
+                    }
+                },
+                {
+                    title: '原料类别',
+                    field: 'HzType',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '按餐厅班组汇总'
+                    }
+                },
+                {
+                    title: '原料名称',
+                    field: 'GyTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-03'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'HzTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-06'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'HzName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张一元'
+                    }
+                },
+                {
+                    title: '库存参考',
+                    field: 'ShTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-03-07'
+                    }
+                },
+                {
+                    title: '需求量',
+                    field: 'ShName',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '李亮'
+                    }
+                },
+                {
+                    title: '采购量',
+                    field: 'rawNum',
+                    align: "center",
+                    width: '100',
+                    formatter:function (val) {
+                        return '<input type="number" name="" value="12">'
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return '<input type="text" name="" value="我是备注">'
+                    }
+                }
+            ]
+
+        });
+        datagrid.loadData();
+    })
+</script>
+</html>

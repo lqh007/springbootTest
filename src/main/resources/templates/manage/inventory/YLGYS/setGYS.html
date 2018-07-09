@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>设置供应商</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .itsoft-panel{
+            width: 600px;
+        }
+        .cont{
+            margin-top: 5px;
+        }
+        .contLt{
+            float: left;
+        }
+        .contRt{
+            float: right;
+        }
+        .contTip{
+            height: 35px;
+            line-height: 35px;
+            padding: 0 10px;
+            font-weight: 700;
+        }
+        .contBody{
+            width: 290px;
+            height: 250px;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .contBody li{
+            height: 37px;
+            line-height: 37px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            padding: 0 10px;
+        }
+        .btnRt{
+            float: left;
+            font-size: 20px;
+            color: orange;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+        .btnLt{
+            float: left;
+            font-size: 20px;
+            color: red;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pd-10">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <div id="toolBtn"></div>
+                <div id="toolSearch" style="float: right"></div>
+            </div>
+            <div class="cont">
+                 <div class="contLt">
+                     <div class="contTip">已选供应商</div>
+                     <div class="contBody contSup">
+                         <ul>
+                            <li data-id="1104">
+                                <span  class="iconfont btnLt iconfont-del"></span>
+                                <span>成都家乡食品有限公司</span>
+                            </li>
+                         </ul>
+                     </div>
+                 </div>
+                 <div class="contRt">
+                     <div class="contTip">供应商列表</div>
+                     <div class="contBody contSupList">
+                         <ul>
+                             <li data-id="1101">
+                                 <span class="iconfont btnRt iconfont-slider-left"></span>
+                                 <span>成都博大精细化工厂</span>
+                             </li>
+                             <li data-id="1102">
+                                 <span class="iconfont btnRt iconfont-slider-left"></span>
+                                 <span>成都红鲤鱼商贸有限公司</span>
+                             </li>
+                             <li data-id="1103">
+                                 <span class="iconfont btnRt iconfont-slider-left"></span>
+                                 <span>新津创新蔬菜种植专业合作社</span>
+                             </li>
+                             <li data-id="1104">
+                                 <span class="iconfont btnRt iconfont-slider-left"></span>
+                                 <span>成都家乡食品有限公司</span>
+                             </li>
+                         </ul>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    $(function () {
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                   text:'保存',
+                   title:'保存',
+                   icon:'iconfont-save',
+                   click:function () {
+                       
+                   } 
+                }
+            ]
+        });
+        
+        //搜索
+        
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'供应商名称',
+            searchEvent:function (val) {
+                
+            }
+        });
+
+        //删除已选供应商
+        $('.contBody').on('click','.btnLt',function () {
+             $(this).parent('li').remove();
+        });
+
+        //选择供应商
+        $('.contBody').on('click','.btnRt',function () {
+            var id=$(this).parent('li').attr('data-id');
+            var val=$(this).next('span').text();
+            var key=true;
+            $('.contSup').find('li').each(function (){
+               if($(this).attr('data-id')==id){
+                   key=false;
+               }
+            });
+            if(key){
+                var li='<li data-id="'+id+'">';
+                li+='<span class="iconfont btnLt iconfont-del"></span>';
+                li+='<span>'+val+'</span>';
+                li+='</li>';
+                $('.contSup ul').append(li);
+            }else {
+                ITSOFT.tools.showMsg('error','供应商已存在');
+            }
+
+
+        });
+
+
+
+
+
+
+
+
+
+    })
+</script>
+</html>

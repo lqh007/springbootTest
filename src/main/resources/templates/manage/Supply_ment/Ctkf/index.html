@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>餐厅库房</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            float: left;
+            margin-top: 5px;
+        }
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+ <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">供应管理->餐厅管理</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <span style="font-size: 16px;color: #333;float: left;line-height: 44px">餐厅：</span>
+                <div class="dropdownlist" id="restaurant" name="restaurant"></div>
+                <div id="toolBtn"></div>
+                <div style="float: left;line-height: 45px;margin-left: 50px">
+                    <span style="font-size: 16px;color: #333">库存状态：</span>
+                    <div id="toolbarbtnop" class="btnop" >
+                        <span data="all" class="yj2 on">全部</span>
+                        <span data="1" class="yj2">零库存</span>
+                        <span data="2" class="yj2">非零库存</span>
+                    </div>
+                </div>
+                <div id="toolSearch" style="float: right"></div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅状态下拉
+        $('#restaurant').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择餐库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+
+        //双日历
+        SetDateRangePicker('gyTime', function(start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
+
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'刷新',
+                    title:'刷新',
+                    icon:"iconfont-huanyipi",
+                    click:function () {
+                        addNewPage()
+                    }
+                },
+                {
+                    text:'明细账本',
+                    title:'明细账本',
+                    width:'120px',
+                    icon:"iconfont-edit2",
+                    click:function () {
+                        detailPage()
+                    }
+                },
+                {
+                    text:'导出',
+                    title:'导出',
+                    icon:"iconfont-daochu",
+                    click:function () {
+                        planPage()
+                    }
+                },
+            ]
+        });
+        //搜索
+        $('#toolSearch').toolbarsearch({
+           width:'160px',
+           placeholder:'单据号',
+           searchEvent:function (val) {
+               datagrid.refreshData(val)
+           }
+        });
+
+        var datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: false,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '编码',
+                    field: 'itemCod',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '0001010'
+                    }
+                },
+                {
+                    title: '名称',
+                    field: 'itemName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '纯牛奶'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'itemGG',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '500ml'
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'itemPP',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '蒙牛'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'itemDW',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '盒'
+                    }
+                },
+                {
+                    title: '批次',
+                    field: 'itemPC',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '20180304'
+                    }
+                },
+                {
+                    title: '库存量',
+                    field: 'itemKCL',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '100'
+                    }
+                },
+                {
+                    title: '采购价',
+                    field: 'itemCGJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '8.00'
+                    }
+                },
+                {
+                    title: '成本金额',
+                    field: 'itemCBJE',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '5.00'
+                    }
+                },
+                {
+                    title: '库存上限',
+                    field: 'itemCKSX',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '400'
+                    }
+                },
+                {
+                    title: '库存下线',
+                    field: 'itemCKXX',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '100'
+                    }
+                },
+                {
+                    title: '保质期',
+                    field: 'itemBZQ',
+                    align: "center",
+                    width: '100',
+                    formatter:function (row,i,o) {
+                       return '6个月'
+                    }
+                },
+                {
+                    title: '类别',
+                    field: 'itemLB',
+                    align: "center",
+                    width: '100',
+                    formatter:function (row,i,o) {
+                       return '饮品'
+                    }
+                },
+                {
+                    title: '拼音码',
+                    field: 'itemPYM',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return 'NJ'
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagrid.refreshData(0)
+        });
+
+        //库存明细
+        function detailPage() {
+            ITSOFT.itWin.open({
+                title:'',
+                full:true,
+                content:['./detailPage.html','no'],
+                closeBtn:0
+            })
+        };
+
+    });
+</script>
+</html>

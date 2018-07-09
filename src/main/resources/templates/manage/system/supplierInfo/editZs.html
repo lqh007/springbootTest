@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>添加证书</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"    th:href="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css'}"  />
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/webuploader-0.1.5/webuploader.css" th:href="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/webuploader.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/webuploader-0.1.5/updatefile.css" th:href="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/updatefile.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+    </style>
+</head>
+<body>
+    <div class="pd-5" style="padding-left: 20px">
+        <form>
+            <div class="form-group row">
+                <label class="control-label">证书名称：</label>
+                <div style="width: 413px">
+                    <input type="text" value="" name="name" class="form-control" placeholder="请输入">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">注册账号：</label>
+                <div style="width: 413px">
+                    <input type="text" value="" name="number" class="form-control" placeholder="请输入">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">有效日期：</label>
+                <div style="width: 413px;position: relative">
+                    <input type="text" class= "form-control" name="effectiveDate" id="datepicker"  placeholder="输入或选择日期">
+                    <span class="caret" style="right: 17px"></span >
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">上传附件：</label>
+                <div>
+                    <div class="file-picker" id="pickerfilemore" style="width: 100%">上传文件</div>
+                    <div class="uploadbox">
+                        <div id="advicefilelist" class="updatefilelist" >
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="uploadfilemore" class="uploadimg">
+                        <input type="hidden" name="fileUrl" id="fileUrl" />
+                        <input type="hidden" name="fileName" id="fileName" >
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="btnBox">
+            <div>
+                <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+                <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"    th:src="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js'}"  type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  th:src="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/date.js'}" type ="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/moment.min.js" th:src="@{${root}+'/itsoftui/plugins/moment.min.js'}" type ="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/webuploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/webuploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js" th:src="@{${root}+'/itsoftui/plugins/webuploader-0.1.5/itsoft-uploader.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.imgResizeH.js" th:src="@{${root}+'/itsoftui/plugins/jquery.imgResizeH.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var staticUploadUrl = '[[${staticUploadUrl}]]';
+    $(function () {
+        SetDateRangePicker('datepicker', function(start, end, label) {
+            var time = start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD');
+            $('input[name=effectiveDate]').val(time);
+        });
+
+        //上传照片
+        $("#uploadfilemore").uploader({
+            pick: "#pickerfilemore",
+            list: "#fileUrl",
+            type: 2,
+            ismore: 1,
+            server: "[[${staticUploadServerUrl}]]",
+            formData: {
+                system:"dining",
+                compress:"yes",                     //是否需要压缩(true:压缩;false:不压缩)
+                widthScale:0.5,                          //宽度缩放比例(填写0-1的保留一位的小数,不允许为0)
+                heightScale:0.5,                         //高度缩放比例(填写0-1的保留一位的小数,不允许为0)
+                fileType:'file'                      //高度缩放比例(填写0-1的保留一位的小数,不允许为0)
+            },
+            success: function (r) {
+                var fileurls = $("#fileUrl").val();
+                var filename = $("#fileName").val();
+                if (!!fileurls) {
+                    fileurls = fileurls.split(",");
+                    if (fileurls.length > 0) {
+                        //多文件的
+                        if( filename == undefined || filename == null || filename == 0) {
+                            filename = r.name;
+                        } else {
+                            filename += "," + r.name;
+                        }
+                        $("#fileName").val(filename);
+//                        $("#fileName").val(r.name);
+                        var $li , $delImg , $img ,
+                            filename;
+                        $("#advicefilelist ul").html("");
+                        var fileNames = $("#fileName").val();
+                        if (!!fileNames) {
+                            fileNames = fileNames.split(",");
+                        }
+                        $.each(fileurls, function (i, o) {
+                            if (fileNames.length > 0) {
+                                filename = fileNames[i];
+                            } else {
+                                filename = r.name;
+                            }
+                            $li
+                                = $("<li/>");
+                            $delImg
+                                = $('<div/>').addClass("delimg").text("×");
+                            $s
+                                = "<a href='[[${staticUploadUrl}]]"+o+"' download='"+filename+"'>" + filename + "</a>";
+                            $li.append($delImg).append($s);
+                            $("#advicefilelist ul").append($li);
+                        });
+                    }
+                }
+            }
+        });
+
+        $(document).on("mouseover", "#advicefilelist li", function () {
+            $(this).find(".delimg").show();
+        }).on("mouseleave", "#advicefilelist li", function () {
+            $(this).find(".delimg").hide();
+        }).on("click", "#advicefilelist li .delimg", function () {
+            //删除
+            var $li =
+                $(this).parent();
+            var fileurls = $("#fileUrl").val();
+            var filenames = $("#fileName").val();
+            if (!!fileurls && !!filenames) {
+                fileurls = fileurls.split(",");
+                filenames = filenames.split(",");
+                if (fileurls.length > 0 && filenames.length > 0) {
+                    console.log($li.index())
+                    fileurls.splice($li.index(), 1);
+                    filenames.splice($li.index(), 1);
+                }
+                fileurls = fileurls.join(",");
+                filenames = filenames.join(",");
+                $("#fileUrl").val(fileurls).attr("data-name", filenames);
+                $("#fileName").val(filenames);
+            }
+            $li.remove();
+        });
+
+        //获取data值
+        getData()
+        function getData() {
+           var data=parent.getRowData();
+           $('[name=name]').val(data.name);
+           $('[name=number]').val(data.number);
+           $('[name=effectiveDate]').val(data.effectiveDate);
+           $('[name=address]').val(data.address);
+           $('[name=picturePath]').val(data.picturePath);
+           $('[name=fileUrl]').val(data.fileUrl);
+           $('[name=fileName]').val(data.fileName);
+           if (!!data.fileUrl && data.fileUrl.length > 0){
+               var fileUrlList = data.fileUrl.split(",");
+               var fileNameList = data.fileName.split(",");
+               if(fileUrlList.length > 0) {
+                   var $li, $delImg, filename,$s;
+                   $("#advicefilelist ul").html("");
+                   $.each(fileUrlList, function (i, o) {
+                       filename = fileNameList[i];
+                       $li = $("<li/>");
+                       $delImg = $('<div/>').addClass("delimg").text("×");
+                       $s = "<a href='[[${staticUploadUrl}]]"+o+"' download='"+filename+"'>" + filename + "</a>";
+                       $li.append($delImg).append($s);
+                       $("#advicefilelist ul").append($li);
+                   });
+               }
+           }
+        }
+
+        $("#btn-ok").on('click', function(event) {
+            var name=$('[name=name]').val();
+            if (name.length == 0){
+                ITSOFT.tools.showMsg('error','请填写证件名称');
+                return false
+            }
+            var number=$('[name=number]').val();
+            if (number.length == 0){
+                ITSOFT.tools.showMsg('error','请填写证件号码');
+                return false
+            }
+            var effectiveDate=$('[name=effectiveDate]').val();
+            if (effectiveDate.length == 0){
+                ITSOFT.tools.showMsg('error','请选择有效日期');
+                return false
+            }
+            var address=$('[name=address]').val();
+            var picturePath=$('[name=picturePath]').val();
+            var fileUrl=$('[name=fileUrl]').val();
+            var fileName=$('[name=fileName]').val();
+            var cols='{';
+            cols+='"id":0,';
+            cols+='"name":"'+name+'",';
+            cols+='"number":"'+number+'",';
+            cols+='"effectiveDate":"'+effectiveDate+'",';
+            cols+='"picturePath":"'+picturePath+'",';
+            cols+='"fileUrl":"'+fileUrl+'",';
+            cols+='"fileName":"'+fileName+'",';
+            cols+='"address":"'+address+'"';
+            cols+='}'
+            cols=JSON.parse(cols);
+
+            parent.datagrid.find('.selectrow').remove();
+            parent.datagrid.insertRow(cols)
+            parent.ITSOFT.itWin.close(index);
+        });
+        $("#btn-cancel").on('click', function(event) {
+            parent.ITSOFT.itWin.close(index);
+        });
+
+    });
+</script>
+</html>

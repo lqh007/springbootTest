@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>添加原料</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css" th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+        .wrap-top{
+            height: 40px;
+            border-bottom: 1px solid #ccc;
+        }
+        .wrap-top span{
+            display: inline-block;
+            width: 110px;
+            line-height: 38px;
+            text-align: center;
+            cursor: pointer;
+
+        }
+        .wrap-on{
+            border-bottom: 2px solid #2e8ded;
+        }
+        .table-body{
+            width: 100%!important;
+        }
+        .typeBox{
+            position: relative;
+            width: 100%;
+        }
+        .typeBox div{
+            float: none;!important;
+        }
+        .typeBoxBd{
+            position: absolute;
+            z-index: 66666;
+            top: 30px;
+            width: 100%;
+            height: 150px;
+            overflow-y: auto;
+            overflow-x:hidden;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        }
+        #dataTree{
+            height: 140px!important;
+        }
+        #number-error {
+            display: block;!important;
+            top: 140px;!important;
+            right: 80px;!important;
+        }
+        .suppliers .datagrid-body{
+            height: 326px!important;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap-top">
+        <span class="wrap-on" data-id="1">基本信息</span>
+        <span data-id="2">供应商</span>
+    </div>
+   <div class="wrap">
+       <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningMaterial/insertOrUpdateDiningMaterial'}" method="post" th:object="${diningMaterial}">
+           <input type="hidden" name="id" th:value="${diningMaterial.id}">
+           <input type="hidden" id="supplyIdListStr" name="supplyIdListStr" >
+           <div class="cont-info" style="margin-left: 25px;margin-top: 20px">
+               <div class="form-group row">
+                   <label class="control-label">类别：</label>
+                   <div style="width: 480px">
+                       <div class="typeBox">
+                           <div class="typeBoxHd">
+                               <input type="text" name="typeName" th:value="${diningMaterial.typeName}" class="form-control">
+                               <input type="hidden" name="typeId" th:value="${diningMaterial.typeId}" class="form-control">
+                               <span class="caret"></span>
+                           </div>
+                           <div class="typeBoxBd" style="display: none">
+                               <div id="dataTree"></div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
+               <div class="form-group row">
+                   <label class="control-label"><em style="color: red;margin-right: 5px">*</em>名称：</label>
+                   <div style="width: 480px;position: relative">
+                        <input type="text" name="name" th:value="${diningMaterial.name}" class="form-control" onblur="generateSpell()">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">拼音码：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="spell" th:value="${diningMaterial.spell}" readonly placeholder="请填写" class="form-control">
+                   </div>
+                   <label class="control-label">编码：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="number" th:value="${diningMaterial.number}" placeholder="请填写" class="form-control">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">条码：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="barCode" th:value="${diningMaterial.barCode}" placeholder="请填写" class="form-control">
+                   </div>
+                   <label class="control-label">规格：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="specification" th:value="${diningMaterial.specification}" placeholder="请填写" class="form-control">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">单位：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="unit" th:value="${diningMaterial.unit}" placeholder="请填写" class="form-control">
+                   </div>
+                   <label class="control-label">核算单位：</label>
+                   <div style="width: 200px;position: relative">
+                        <input type="text" name="accountingUnit" th:value="${diningMaterial.accountingUnit}" placeholder="请填写" class="form-control">
+                        <span style="position: absolute;right: -15px;top: 5px;">克</span>
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">净料率：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="materialRate" th:value="${diningMaterial.materialRate}" placeholder="请填写" class="form-control">
+                   </div>
+                   <label class="control-label">净料要求：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="materialRemark" th:value="${diningMaterial.materialRemark}" placeholder="请填写" class="form-control">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">品牌：</label>
+                   <div style="width: 200px">
+                        <input type="text" name="brand" th:value="${diningMaterial.brand}"  placeholder="请填写" class="form-control">
+                   </div>
+                   <label class="control-label">保质期：</label>
+                   <div style="width: 200px;position: relative">
+                        <input type="text" name="warranty" th:value="${diningMaterial.warranty}" placeholder="请填写" class="form-control">
+                       <span style="position: absolute;right: -15px;top: 5px;">天</span>
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="control-label">备注：</label>
+                   <div style="width:480px">
+                       <textarea type="text" name="remark" th:text="${diningMaterial.remark}" placeholder="请填写" class="form-control" style="height: 80px"></textarea>
+                   </div>
+               </div>
+           </div>
+           <!--供应商    -->
+           <div class="suppliers" style="display: none">
+               <div class="itsoft-toolbar" style="border-top: 0">
+                   <div id="toolBtn"></div>
+               </div>
+               <div class="itsoft-datagrid supplyGrid" id="supplyGrid" style="border-top: 0"></div>
+           </div>
+       </form>
+       <div class="btnBox">
+           <div>
+               <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+               <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+           </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js" th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/pinyinjs/dict/pinyin_dict_firstletter.js" th:src="@{${root}+'/itsoftui/plugins/pinyinjs/dict/pinyin_dict_firstletter.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/pinyinjs/pinyinUtil.js" th:src="@{${root}+'/itsoftui/plugins/pinyinjs/pinyinUtil.js'}"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var isSave = false;
+    var loadingindex;
+    var supplyGrid;
+    var supplyIdListStr = '';
+  $(function () {
+      $('.typeBoxHd').on('click',function () {
+          $('.typeBoxBd').slideDown(200)
+      });
+      //类别
+      dataTree= $('#dataTree').itsofttree({
+          url:'[[${root}]]/api/v2/dining/manage/diningMaterialType/diningMaterialTypeTreeList',
+          type: "post",
+          height:'100%',
+          click:function (id,val) {
+              $('[name=typeName]').val(val);
+              $('[name=typeId]').val(id);
+              $(document).find('.typeBoxBd').hide()
+          }
+      });
+
+
+
+      $('#toolBtn').toolbarbtn({
+          btn:[
+              {
+                  text:'添加',
+                  title:'添加',
+                  icon:'iconfont-add',
+                  click:function () {
+                      addSup()
+                  }
+              } ,{
+                  text:'删除',
+                  title:'删除',
+                  icon:'iconfont-del2',
+                  click:function () {
+                      delrow();
+                  }
+              }
+
+          ]
+      });
+      supplyGrid=$('#supplyGrid').datagrid({
+          keyField: "supplyId",
+          page:false,
+          url: '[[${root}]]/api/v2/dining/manage/diningMaterial/diningMaterialSuppliersList',
+          type: 'POST',
+          line: "both",
+          queryParams: {materialId:"[[${diningMaterial.id}]]"},
+          isSequence: true,
+          singleSelect: false,
+          eventrow: false,
+          click: function() {
+
+          },
+          dblclick: function() {
+
+          },
+          columns:[
+              {
+                  field:'supplyId',
+                  isshow:false
+              },
+              {
+                  title: '名称',
+                  field: 'supplyName',
+                  align: 'left',
+                  widthfix:true,
+                  width: '530',
+                  formatter:function () {
+                  }
+              }
+          ]
+      });
+      supplyGrid.loadData(0);
+
+      //添加供应商
+      function addSup() {
+          getSupplyIdListStr();
+          ITSOFT.itWin.open({
+              title:'添加供应商',
+              area:['400px','300px'],
+              content:['[[${root}]]/redirect/system/addMaterialSupply','no']
+          })
+      }
+
+      //删除
+      function delrow() {
+          //获取选中行
+          var selectedRows = supplyGrid.getSelectedRows();
+          console.log(selectedRows);
+          if (selectedRows.length == 0) {
+              ITSOFT.tools.showMsg("error", "请选择要删除的行");
+              return false;
+          }
+          //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+          $(selectedRows).each(function (i, val) {
+              //执行成功后删除datagrid数据
+              supplyGrid.deleteRow(val);
+          });
+      }
+
+      function getSupplyIdListStr() {
+          var cols = '';
+          $('#supplyGrid').find('.datagrid-body').find('tr').each(function (i,row) {
+              if (i != 0) {
+                  cols += ',';
+              }
+              cols+=$(row).find('[field=supplyId]').text();
+          })
+          supplyIdListStr = cols;
+      }
+
+      function formatSupplyIdListStr() {
+          var cols = '[';
+          $('#supplyGrid').find('.datagrid-body').find('tr').each(function (i,row) {
+              if (i == 0) {
+                  cols += '{';
+              } else {
+                  cols += ',{';
+              }
+              cols+='"supplyId":"'+$(row).find('[field=supplyId]').text()+'",';
+              cols+='"supplyName":"'+$(row).find('[field=supplyName]').text()+'"';
+              cols+='}'
+          })
+          cols += ']';
+          $('#supplyIdListStr').val(cols);
+      }
+
+       //验证
+     $('#addform').validate({
+        rules:{
+            name:{
+                required: true,
+            },
+            number:{
+                isIntGteZero: true,
+            }
+        },
+         messages:{
+             number:{
+                 isIntGteZero:'编码只能输入大于零的整数',
+             }
+         },
+        onkeyUp:false,
+        focusCleanup:false,
+        success: "valid",
+        submitHandler: function(form) {
+           $(form).ajaxSubmit({
+               beforeSend: function () {
+                   if (isSave) {
+                       parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                       return false;
+                   }
+                   isSave = true;
+                   loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+               },
+               success:function(data){
+                   //提交成功后
+                   isSave = false;
+                   parent.ITSOFT.itWin.close(loadingindex);
+                   if(data.errorCode==0){
+                       if(data.data.type == "add"){
+                           parent.datagrid.insertRow(data.data.obj);
+                           parent.ITSOFT.tools.showMsg("ok",data.message);
+                           document.getElementById("addform").reset();
+                           $('input[name=typeId]').val("[[${diningMaterial.typeId}]]")
+                           $('input[name=typeName]').val("[[${diningMaterial.typeName}]]")
+                       }else {
+                           parent.datagrid.editRow(data.data.obj);
+                           parent.ITSOFT.tools.showMsg("ok",data.message);
+                           parent.ITSOFT.itWin.close(index);
+                       }
+                   }else{
+                       parent.ITSOFT.tools.showMsg("error",data.message);
+                   }
+               },
+               error:function(){
+                   isSave = false;
+                   parent.ITSOFT.itWin.close(loadingindex);
+                   parent.ITSOFT.tools.showMsg("error", "提交失败")
+               }
+           });
+       }
+     })
+
+      //切换导航
+      $('.wrap-top').on('click','span',function () {
+          $(this).addClass('wrap-on').siblings().removeClass('wrap-on');
+          var id=$(this).attr('data-id');
+          if(id==1){
+              $('.cont-info').show();
+              $('.suppliers').hide();
+          }
+          if(id==2){
+              $('.cont-info').hide();
+              $('.suppliers').show();
+          }
+      })
+
+      $("#btn-ok").on('click', function(event) {
+          formatSupplyIdListStr();
+          $("#addform").submit();
+      });
+      $("#btn-cancel").on('click', function(event) {
+          parent.ITSOFT.itWin.close(index)
+      });
+  })
+    function generateSpell() {
+        $('[name="spell"]').val(pinyinUtil.getFirstLetter($('[name="name"]').val()));
+    }
+</script>
+</html>

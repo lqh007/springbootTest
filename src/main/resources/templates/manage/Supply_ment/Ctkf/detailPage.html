@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>库存明细账单</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .print-top{
+            text-align: center;
+            padding: 15px 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f0f0f;
+        }
+        .wrap-print{
+            width: 685px;
+            margin: 0 auto;
+        }
+        .print-bd-top label{
+            margin-right: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+        .print-bd-cont thead{
+            background-color: #f2f2f2;
+        }
+        .print-bd-cont td{
+            height: 30px;
+            line-height: 30px;
+            padding: 0 2px;
+        }
+        .print-footer{
+            margin-top: 10px;
+        }
+        .print-footer label{
+            font-weight: 500;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">原料仓库->库存明细账单</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <div style="float: left;line-height: 45px;margin-right: 50px">
+                    <span style="font-size: 16px;color: #333;float: left">日期区间：</span>
+                    <div id="toolbarbtnop1" class="btnop" style="float: left" >
+                        <span data="all" class="yj2 ">全部</span>
+                        <span data="0" class="yj2 on">本年</span>
+                        <span data="1" class="yj2">上月</span>
+                        <span data="2" class="yj2">本月</span>
+                    </div>
+                    <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                        <input type="text" class= "form-control" name="gyTime" id="gyTime"  style="width: 240px" placeholder="输入或选择日期">
+                        <span class="caret" style="right: 17px"></span >
+                    </div>
+                </div>
+                <div id="toolBtn" style="float: right"></div>
+            </div>
+            <div class="itsoft-datagrid" style="height: 100%;border-top: 0">
+                <div class="wrap-print">
+                    <!--标题-->
+                    <div class="print-top">
+                        餐厅库存明细账
+                    </div>
+                    <!--表格-->
+                    <div class="print-bd">
+                        <div class="print-bd-top">
+                            <label>
+                                <span>原料名称:</span>
+                                <span>双汇冷鲜肉</span>
+                            </label>
+                            <label>
+                                <span>采购价:</span>
+                                <span>120.00</span>
+                            </label>
+                            <label>
+                                <span>批次:</span>
+                                <span>20180202</span>
+                            </label>
+                            <label style="float: right">
+                                <span>时间区间</span>
+                                <span>2018-03-01至2018-03-08</span>
+                            </label>
+                        </div>
+                        <div class="print-bd-cont">
+                            <table border="1" width="100%">
+                                <colgroup>
+                                    <col style="width: 40px;"/>
+                                    <col style="width: 100px;"/>
+                                    <col style="width: 100px;"/>
+                                    <col style="width: 200px"/>
+                                    <col style="width: 80px"/>
+                                    <col style="width: 80px"/>
+                                    <col style="width: 80px"/>
+                                    <col style="width: 80px"/>
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <td style="text-align: center">序号</td>
+                                    <td style="text-align: center">日期</td>
+                                    <td style="text-align: center">业务单据号</td>
+                                    <td style="text-align: center">摘要</td>
+                                    <td style="text-align: center">上期结转</td>
+                                    <td style="text-align: center">本期入库</td>
+                                    <td style="text-align: center">本期出库</td>
+                                    <td style="text-align: center">库存</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td style="text-align: center">1</td>
+                                    <td style="text-align: center">2018-02-02</td>
+                                    <td style="text-align: center">RK201802020001</td>
+                                    <td>从西安双汇集团采购</td>
+                                    <td style="text-align: center">桶</td>
+                                    <td style="text-align: right">4</td>
+                                    <td style="text-align: right">3</td>
+                                    <td style="text-align: right">12</td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center">2</td>
+                                    <td style="text-align: center">2018-03-02</td>
+                                    <td style="text-align: center">RK201802020001</td>
+                                    <td>从西安双汇集团采购</td>
+                                    <td style="text-align: center">斤</td>
+                                    <td style="text-align: right">4</td>
+                                    <td style="text-align: right">3</td>
+                                    <td style="text-align: right">12</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+
+        $('#toolBtn').toolbarbtn({
+            btn:[{
+                text:'打印',
+                title:'打印',
+                icon:'iconfont-dayinji',
+                click:function () {
+                    print()
+                }
+            }]
+        });
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'单据号',
+            searchEvent:function (val) {
+
+            }
+        });
+        //双日历
+        SetDateRangePicker('gyTime', function(start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
+        //打印
+        function print() {
+            window.print()
+        }
+    })
+</script>
+</html>

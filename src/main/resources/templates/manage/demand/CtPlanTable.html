@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>餐厅需求计划表</title>
+    <link rel="stylesheet" href="../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../itsoftui/plugins/pikaday/pikaday.css" />
+    <link rel="stylesheet" href="../../../../../common/css/indexBase.css" />
+    <link rel="stylesheet" href="../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border: 1px solid #ccc;
+            margin-top: -5px;
+        }
+        .itsoft-toolbar>div{
+            margin-right: 15px;
+            line-height: 45px;
+        }
+        .icheckbox-blue{
+            top:12px;
+        }
+        .print-top{
+            font-size: 20px;
+            color: #333;
+            font-weight: 700;
+            text-align: center;
+        }
+        .print-bd{
+            width: 700px;
+            margin: 15px auto;
+        }
+        .print-bd-top label{
+            font-weight: 400;
+            margin-right: 50px;
+        }
+        .print-table td{
+            text-align: center;
+            height: 30px;
+            line-height: 30px;
+        }
+        .print-footer{
+            margin-top: 15px;
+        }
+        .print-footer label{
+            font-weight:400;
+            margin-right: 10px;
+
+        }
+    </style>
+</head>
+<body>
+     <div class="pd-10 wrap">
+         <div class="wrap-top">
+             <p style="color: #737373;float: left;">需求计划->采购计划</p>
+             <p id="closeBtn" style="float: right;"></p>
+         </div>
+         <div class="wrap-bd">
+           <div class="itsoft-toolbar">
+              <div style="float: left">
+                  <span>餐厅：</span>
+                  <div class="dropdownlist" id="restaurant" name="restaurant"></div>
+              </div>
+              <div style="float: left">
+                  <span>供应时间：</span>
+                  <div class="dropdownlist" style="border: 0">
+                      <input type="text" class= "form-control" name="gyTime" id="gyTime"  placeholder="输入或选择日期">
+                      <span class="caret"></span >
+                  </div>
+              </div>
+              <div style="float: left">
+                  <span>库房：</span>
+                  <div class="dropdownlist" id="warehouse" name="warehouse"></div>
+              </div>
+              <div style="float: left">
+                  <span>原料类别：</span>
+                  <div class="dropdownlist" id="rawType" name="rawType"></div>
+              </div>
+
+              <div class="check-box">
+                  <input type="checkbox" id="checkbox-1">
+                  <label for="checkbox-1" style="color: red">显示实际数</label>
+              </div>
+              <div id="toolBtn" style="float: right"></div>
+          </div>
+           <div class="itsoft-panel" style="padding-top: 30px;border: 1px solid #ccc;border-top: 0">
+             <div class="print-top">
+                 XXXX需求计划表
+             </div>
+             <div class="print-bd">
+                 <div class="print-bd-top">
+                     <label>
+                         <span>供应时间：</span>
+                         <span>2018-03-07</span>
+                     </label>
+                     <label>
+                         <span>库房：</span>
+                         <span>采供部低值易耗库</span>
+                     </label>
+                 </div>
+                 <div class="print-table">
+                     <table border="1">
+                         <colgroup>
+                             <col style="width: 50px">
+                             <col style="width: 100px">
+                             <col style="width: 100px">
+                             <col style="width: 100px">
+                             <col style="width: 100px">
+                             <col style="width: 80px">
+                             <col style="width: 100px">
+                             <col style="width: 50px">
+                         </colgroup>
+                         <thead>
+                            <tr>
+                                <td>序号</td>
+                                <td>原料编码</td>
+                                <td>原料名称</td>
+                                <td>原料类别</td>
+                                <td>规格</td>
+                                <td>单位</td>
+                                <td>品牌</td>
+                                <td>需求量</td>
+                            </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>0102</td>
+                                <td>炒锅</td>
+                                <td></td>
+                                <td>40CM*20cm</td>
+                                <td>口</td>
+                                <td>球釜</td>
+                                <td>10</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>0102</td>
+                                <td>炒锅</td>
+                                <td></td>
+                                <td>40CM*20cm</td>
+                                <td>口</td>
+                                <td>球釜</td>
+                                <td>10</td>
+                            </tr>
+                         </tbody>
+                     </table>
+                 </div>
+                 <div class="print-footer">
+                     <label>
+                         <span>打印时间：</span>
+                         <span>2018-03-07 10:12:12</span>
+                     </label>
+                     <label style="width: 140px">
+                         <span>打印：</span>
+                         <span>管理员</span>
+                     </label>
+                     <label style="width: 140px">
+                         <span>经办人：</span>
+                         <span></span>
+                     </label>
+                     <label style="width: 140px">
+                         <span>审核人：</span>
+                         <span></span>
+                     </label>
+                 </div>
+             </div>
+         </div>
+         </div>
+     </div>
+</body>
+<script src="../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../itsoftui/plugins/pikaday/pikaday.js" type ="text/javascript"></script>
+<script src="../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅
+       $('#restaurant').dropdownlist({
+           dataurl:'../../../../../data/select.json',
+           placeholder:'请选择餐厅',
+           width:'150px',
+           changeEvent:function (id,val) {
+
+           }
+       });
+       //供应时间
+        var pickerydrq = new  Pikaday({
+            field: document.getElementById('gyTime'),
+            firstDay: 1,
+            format: 'YYYY-MM-DD',
+            minDate: new Date( '2000-01-01'),
+            maxDate: new Date( '2217-12-01'),
+            yearRange: [1950, 2020]
+        });
+        //库房
+        $('#warehouse').dropdownlist({
+            dataurl:'../../../../../data/select.json',
+            placeholder:'请选择餐厅',
+            width:'150px',
+            changeEvent:function (id,val) {
+
+            }
+        });
+        //原料类别
+        $('#rawType').dropdownlist({
+            dataurl:'../../../../../data/select.json',
+            placeholder:'请选择餐厅',
+            width:'150px',
+            changeEvent:function (id,val) {
+
+            }
+        });
+        $('.check-box input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+        //  打印
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'打印',
+                    title:'打印',
+                    icon:'iconfont-dayinji',
+                    click:function () {
+                        window.print()
+                    }
+                }
+            ]
+        })
+
+    })
+</script>
+</html>

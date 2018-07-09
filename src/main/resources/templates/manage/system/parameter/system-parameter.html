@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>系统参数</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css"
+          th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css"
+          th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css"
+          th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css"
+          th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .control-label {
+            width: 280px;
+            text-align: left;
+            color: #0f0f0f;
+        }
+
+        .time-box {
+            display: none;
+        }
+
+        .save {
+            width: 100%;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            background-color: #2e8ded;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 100px;
+        }
+
+        .time-box input {
+            text-align: right;
+            padding-right: 5px;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">系统管理->系统参数</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <form id="addform" class="form-wrap"
+              th:action="@{${root}+'/api/v2/dining/manage/systemConfiguration/saveSystem'}" method="post">
+            <input type="hidden" name="id" th:value="${configuration.id}">
+            <div class="form-group row">
+                <label class="control-label">需求计划是否自动审批</label>
+                <div style="margin-top: 5px">
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-1" name="needAudit" value="1"
+                               th:checked="${configuration.needAudit} eq '1'">
+                        <label for="checkbox-1">是</label>
+                    </div>
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-8" name="needAudit" value="0"
+                               th:checked="${configuration.needAudit} eq '0'">
+                        <label for="checkbox-8">否</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">采购计划是否自动审批</label>
+                <div style="margin-top: 5px">
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-1" name="procurementPlan" value="1"
+                               th:checked="${configuration.procurementPlan} eq '1'">
+                        <label for="checkbox-1">是</label>
+                    </div>
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-8" name="procurementPlan" value="0"
+                               th:checked="${configuration.procurementPlan} eq '0'">
+                        <label for="checkbox-8">否</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">是否消费之后才能评价</label>
+                <div style="margin-top: 5px">
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-2" name="consumptionEvaluation" value="1"
+                               th:checked="${configuration.consumptionEvaluation} eq '1'">
+                        <label for="checkbox-2">是</label>
+                    </div>
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-3" name="consumptionEvaluation" value="0"
+                               th:checked="${configuration.consumptionEvaluation} eq '0'">
+                        <label for="checkbox-3">否</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">限制每月评价次数</label>
+                <div style="margin-top: 5px">
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-4" data-tip="1" name="monthlyLimit" value="1"
+                               th:checked="${configuration.monthlyLimit} eq '1'">
+                        <label for="checkbox-4">是</label>
+                    </div>
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-5" data-tip="0" name="monthlyLimit" value="0"
+                               th:checked="${configuration.monthlyLimit} eq '0'">
+                        <label for="checkbox-5">否</label>
+                    </div>
+                    <div class="check-box time-box"
+                         th:style="'display:' + @{(${configuration.monthlyLimit} eq '1' ? 'block' : 'none')} + ''">
+                        <input type="text" th:value="${configuration.monthlyLimitNumber}" name="monthlyLimitNumber"
+                               style="width: 120px">
+                        <span>次</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label">评价被反对之后是否不能评论</label>
+                <div style="margin-top: 5px">
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-6" data-tip="1" name="antiEvaluation" value="1"
+                               th:checked="${configuration.antiEvaluation} eq '1'">
+                        <label for="checkbox-6">是</label>
+                    </div>
+                    <div class="check-box">
+                        <input type="checkbox" id="checkbox-7" data-tip="0" name="antiEvaluation" value="0"
+                               th:checked="${configuration.antiEvaluation} eq '0'">
+                        <label for="checkbox-7">否</label>
+                    </div>
+                    <div class="check-box time-box"
+                         th:style="'display:' + @{(${configuration.antiEvaluation} eq '1' ? 'block' : 'none')} + ''">
+                        <input type="text" th:value="${configuration.antiEvaluationNumber}" name="antiEvaluationNumber"
+                               style="width: 120px">
+                        <span>次</span>
+                        <span style="color: #ddd">超过次数之后就不能评价</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class=" row form-group" style="margin-top: 50px;padding-left: 190px">
+            <div class="col-md-1" style="width: 200px;">
+                <div class="save">保存</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js"
+        th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js"
+        th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jQuery.form.js"
+        th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/laydate/laydate.js"
+        th:src="@{${root}+'/itsoftui/plugins/laydate/laydate.js'}"></script>
+<!--验证-->
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}"></script>
+<script type="text/javascript" src="../../../../static/itsoftui/js/itsoftui.js"
+        th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+
+<script>
+    var index = parent.layer.getFrameIndex(window.name);
+    $(function () {
+        $('.check-box input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '',
+                    title: '关闭',
+                    width: '35px',
+                    icon: 'iconfont-close',
+                    click: function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+
+        //input选择
+        $('.form-group').find('input').each(function () {
+            $(this).on('click', function () {
+                if ($(this).is(':checked')) {
+                    $(this).parents('.check-box').siblings().find('input').iCheck('uncheck');
+                    var tip = $(this).attr('data-tip');
+                    if (tip == '1') {
+                        $(this).parents('.check-box').siblings('.time-box').show();
+                    } else {
+                        $(this).parents('.check-box').siblings('.time-box').hide();
+                    }
+                } else {
+                    $(this).parents('.check-box').siblings('.time-box').hide();
+                }
+            });
+        });
+
+//form提交参数
+        var isSave = false;
+        var loadingindex;
+        var index = parent.layer.getFrameIndex(window.name);
+        var options = {
+            beforeSend: function () {
+                if (isSave) {
+                    ITSOFT.tools.showMsg("error", "请不要重复提交");
+                    return;
+                }
+                isSave = true;
+                loadingindex = ITSOFT.itWin.msg("正在提交数据", 16);
+            },
+            success: function (data) {
+                //提交成功后
+                isSave = false;
+                if (data.errorCode == 0) {
+                    ITSOFT.itWin.close(loadingindex);
+                    ITSOFT.tools.showMsg("ok", data.message);
+                } else {
+                    ITSOFT.itWin.close(loadingindex);
+                    ITSOFT.tools.showMsg("error", data.message);
+                }
+            },
+            error: function (XmlHttpRequest, textStatus, errorThrown) {
+                //提交失败
+                isSave = false;
+                ITSOFT.itWin.close(loadingindex);
+                //提交失败
+                ITSOFT.tools.showMsg("error", "提交失败");
+            }
+        };
+
+//			验证
+        $('#addform').validate({
+            rules: {},
+            messages: {},
+            onkeyup: false,
+            focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+            success: "valid",
+            submitHandler: function (form) {
+                $(form).ajaxSubmit(options);
+            }
+        });
+
+
+        //保存
+        $('.save').on('click', function () {
+            var monthlyLimit = $('input[name=monthlyLimit]:checked').val();
+            if (monthlyLimit == '1') {
+                var monthlyLimitNumber = $('input[name=monthlyLimitNumber]').val();
+                if (!/^[1-9][0-9]*$/.test(monthlyLimitNumber)) {
+                    ITSOFT.tools.showMsg("error", "请填写正确的次数");
+                    return false;
+                }
+            }
+            var antiEvaluation = $('input[name=antiEvaluation]:checked').val();
+            if (antiEvaluation == '1') {
+                var antiEvaluationNumber = $('input[name=antiEvaluationNumber]').val();
+                if (!/^[1-9][0-9]*$/.test(antiEvaluationNumber)) {
+                    ITSOFT.tools.showMsg("error", "请填写正确的次数");
+                    return false;
+                }
+            }
+            $("#addform").submit();
+        })
+
+    });
+</script>
+</html>

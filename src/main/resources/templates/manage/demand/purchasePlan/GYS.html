@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>设置供应商</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .warehouse{
+            border:1px solid #ccc;
+            margin-top: 5px;
+        }
+        .moduleType label{
+            color: #333;
+            font-weight: 400;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        .approval{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .approval{
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10 wrap">
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+               <div id="toolBtn"></div>
+            </div>
+            <div class="itsoft-datagrid" id="datagrid" style="border-top: 0"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        $('#toolBtn').toolbarbtn({
+          btn:[
+            {
+              text:'保存',
+              title:'保存',
+              icon:'iconfont-save',
+              click:function () {
+                   saveRow()
+              }
+            }
+          ]
+        })
+        
+      //列表
+      datagrid=$('#datagrid').datagrid({
+        keyField: "orderid",
+        page:false,
+        url: '../../../../../../data/order.json',
+        type: 'GET',
+        line: "both",
+        isSequence: true,
+        singleSelect: true,
+        eventrow: false,
+        click: function() {
+
+        },
+        dblclick: function() {
+          loadPage()
+        },
+        columns:[
+          {
+            field:'id',
+            isshow:false
+          },
+          {
+            title: '供应商名称',
+            field: 'HZDH',
+            align: "center",
+            width: '140',
+            widthfix:true,
+            formatter:function () {
+              return '新津创新蔬菜种植专业合作社'
+            }
+          }
+        ]
+      })
+      datagrid.loadData()
+
+     //保存
+
+     function saveRow() {
+         var row=datagrid.getSelectedRow();
+          if(row.length==0){
+            ITSOFT.tools.showMsg('error','请选择供应商');
+            return false
+          }
+          var val=row.find('[field=HZDH]').text();
+          parent.getsupplier(val);
+          parent.ITSOFT.itWin.close(index)
+     }
+
+
+    })
+</script>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>原料供应商</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            float: left;
+            margin-top: 5px;
+        }
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .SdInput .icheckbox-blue{
+            margin-top: -16px;
+            margin-left: 10px;
+        }
+        .wrapLt{
+            width: 200px;
+            float: left;
+            height: 100%;
+            border-right: 1px solid #ccc;
+        }
+        .wrapRt{
+            margin-left: 205px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+ <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">库存->原料供应商</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <span style="font-size: 16px;color: #333;float: left;line-height: 44px">库房：</span>
+                <div class="dropdownlist" id="restaurant" name="restaurant"></div>
+                <div id="toolBtn"></div>
+                <div id="toolSearch" style="float: right"></div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div class="wrapLt">
+                    <div id="selectTree"></div>
+                </div>
+                <div class="wrapRt">
+                    <div id="datagrid"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //库房下拉
+        $('#restaurant').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'单据号',
+            searchEvent:function (val) {
+                datagrid.refreshData(val)
+            }
+        });
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'刷新',
+                    title:'刷新',
+                    icon:"iconfont-huanyipi",
+                    click:function () {
+                       datagrid.loadData(0)
+                    }
+                },
+                {
+                    text:'设置供应商',
+                    title:'设置供应商',
+                    icon:"iconfont-add",
+                    width:'120px',
+                    click:function () {
+                        setSup()
+                    }
+                },
+                {
+                    text:'批量设置',
+                    title:'批量设置',
+                    icon:"iconfont-save",
+                    width:'120px',
+                    click:function () {
+                        PLSet()
+                    }
+                }
+            ]
+        });
+
+        $('#selectTree').itsofttree({
+            url: "../../../../../../data/kfdata.json",
+            type: "GET",
+            height: "100%",
+            click: function(value, text) {
+                ITSOFT.tools.showMsg("ok", value + text);
+            }
+        });
+
+
+        var datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: false,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '类别',
+                    field: 'itemCod',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '豆制品'
+                    }
+                },
+                {
+                    title: '名称',
+                    field: 'itemName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '腐竹'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'itemCGJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '500g'
+                    }
+                },
+                {
+                    title: '编码',
+                    field: 'itemGYJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '5417'
+                    }
+                },
+                {
+                    title: '供应商',
+                    field: 'itemSD',
+                    align: "left",
+                    width: '150',
+                    widthfix:true,
+                    formatter:function () {
+                        return '西安安全食品供应有限公司'
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagrid.refreshData(0)
+        });
+        //设置供应商
+        function setSup() {
+            ITSOFT.itWin.open({
+                title:'设置供应商',
+                area:['620px','400px'],
+                content:['./setGYS.html','no']
+            })
+        };
+
+        //批量设置
+        function PLSet() {
+            ITSOFT.itWin.open({
+                title:'批量设置',
+                area:['510px','450px'],
+                content:['rowType.html','no']
+            })
+        }
+    });
+</script>
+</html>

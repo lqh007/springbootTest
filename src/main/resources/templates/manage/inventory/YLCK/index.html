@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>库房原料设置</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            float: left;
+            margin-top: 5px;
+        }
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .SdInput .icheckbox-blue{
+            margin-top: -16px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+ <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">库存->库房原料设置</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <div style="float: left;margin-right: 20px">
+                    <span style="font-size: 16px;color: #333;float: left;line-height: 44px">库房：</span>
+                    <div class="dropdownlist" id="restaurant" name="restaurant"></div>
+                </div>
+                <div id="toolBtn" style="float: left"></div>
+                <div  style="float: left;margin-left: 50px">
+                    <span style="font-size: 16px;color: #333;float: left;line-height: 44px">库存状态：</span>
+                    <div class="btnop">
+                        <span class="yj3 on">全部</span>
+                        <span class="yj3">零库存</span>
+                        <span class="yj3">非零库存</span>
+                    </div>
+                </div>
+                <div id="toolSearch" style="float: right"></div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //库房下拉
+        $('#restaurant').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //搜索
+        $('#toolSearch').toolbarsearch({
+            width:'160px',
+            placeholder:'名称/编码/拼音码',
+            searchEvent:function (val) {
+                datagrid.refreshData(val)
+            }
+        });
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'刷新',
+                    title:'刷新',
+                    icon:"iconfont-huanyipi",
+                    click:function () {
+                        datagrid.loadData(0)
+                    }
+                },
+                {
+                    text:'明细账本',
+                    title:'添加',
+                    icon:"iconfont-edit2",
+                    width:'100px',
+                    click:function () {
+                        addNewPage()
+                    }
+                },
+                {
+                    text:'导出',
+                    title:'导出',
+                    icon:"iconfont-daochu",
+                    click:function () {
+
+                    }
+                }
+            ]
+        });
+        var datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: false,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '编码',
+                    field: 'itemCod',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '10123'
+                    }
+                },
+                {
+                    title: '名称',
+                    field: 'itemName',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '胆水板豆腐'
+                    }
+                },
+                {
+                    title: '规格',
+                    field: 'itemGG',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return ''
+                    }
+                },
+                {
+                    title: '品牌',
+                    field: 'itemPP',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '洛源豆腐'
+                    }
+                },
+                {
+                    title: '批次',
+                    field: 'itemPC',
+                    align: "center",
+                    width: '150',
+                    formatter:function () {
+                        return '012456231'
+                    }
+                },
+                {
+                    title: '单位',
+                    field: 'itemDW',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '斤'
+                    }
+                },
+                {
+                    title: '采购价',
+                    field: 'itemCGJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '120.00'
+                    }
+                },
+                {
+                    title: '成本金额',
+                    field: 'itemGBJ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '100.00'
+                    }
+                },
+                {
+                    title: '库存上限',
+                    field: 'itemKCSX',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '300'
+                    }
+                },
+                {
+                    title: '库存下限',
+                    field: 'itemKCXX',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '100'
+                    }
+                },
+                {
+                    title: '保质期',
+                    field: 'itemBZQ',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '1周'
+                    }
+                },
+                {
+                    title: '类别',
+                    field: 'itemLB',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '豆制品'
+                    }
+                },
+                {
+                    title: '拼音码',
+                    field: 'itemPYM',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return 'TFBOY'
+                    }
+                }
+            ]
+        });
+        datagrid.loadData();
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagrid.refreshData(0)
+        });
+        //新建需求单
+        function addNewPage() {
+            ITSOFT.itWin.open({
+                title:'添加原料',
+                area:['850px','450px'],
+                content:['./addYlRow.html','no']
+            })
+        };
+
+    });
+</script>
+</html>

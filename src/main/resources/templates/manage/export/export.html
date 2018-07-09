@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>导出选择页</title>
+    <link rel="stylesheet" href="../../../static/itsoftui/css/itsoftui.css" th:href="@{${root}+'/itsoftui/css/itsoftui.css'}"/>
+    <link rel="stylesheet" href="../../../static/itsoftui/plugins/bootstrap-3.3.5-dist/css/bootstrap.min.css" th:href="@{${root}+'/itsoftui/plugins/bootstrap-3.3.5-dist/css/bootstrap.min.css'}"/>
+    <style>
+        .warp{
+            width:350px;
+            height: 500px;
+        }
+        .cont-top{
+            text-align: left;
+            padding-left: 20px;
+            height: 50px;
+            line-height: 50px;
+            border-bottom: 1px solid #ccc;
+            font-size: 18px;
+            background-color: #e4e9ef;
+        }
+        .cont{
+            height: 450px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        .cont>ul>li{
+            width: 100%;
+            height: 40px;
+            border-bottom: 1px solid #ccc;
+            line-height: 40px;
+            padding-left: 20px;
+        }
+        .cont>ul>li>label{font-weight: 100;}
+        .cont>ul>li>label>span{margin-left:10px;}
+        .Mybutton{
+            width: 100%;
+            height: 50px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background-color: #e4e9ef;
+            margin: 0;
+            padding: 0;
+        }
+        .btn-primary{float: left;}
+        .btn-default{float: right;}
+    </style>
+</head>
+<body>
+<div class="warp">
+    <div class="cont-top">选择列</div>
+    <div class="cont">
+        <ul>
+        </ul>
+    </div>
+    <div class="form-group  Mybutton">
+        <div style="width:60px;margin: 0 auto;height: 100%;padding-top: 10px;">
+            <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="导出">
+            <input id="btn-cancel" class="btn btn-primary btn-its" type="button" style="float: left;margin-right: -271px;" value="关闭">
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../static/itsoftui/plugins/jquery-1.12.4.min.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.min.js'}"></script>
+<script src="../../../static/itsoftui/js/newitsoftui.js" th:src="@{${root}+'/itsoftui/js/newitsoftui.js'}" type="text/javascript" charset="utf-8"></script>
+<script>
+    $(function(){
+        var index = parent.layer.getFrameIndex(window.name);
+        var datas = parent.exportdata.split(';');
+        $.each(datas,function (index,value) {
+            if (value.length>0) {
+                var data = value.split(',');
+                var html='<li><label><input type="checkbox" checked /><span data-value="'+data[0]+'">'+data[1]+'</span></label></li>';
+                $('.cont>ul').append(html);
+            }
+        })
+        $('#btn-ok').on('click',function(){
+            var checkdata="";
+            $(".cont ul>li>label>span").each(function(){
+                if($(this).prev("input").is(':checked')){
+                    checkdata+=$(this).attr("data-value")+","+$(this).html()+";";
+                }
+            });
+            console.log(checkdata);
+            parent.exportData(checkdata,index);
+        });
+        $('#btn-cancel').on('click',function(){
+            parent.ITSOFT.itWin.close(index);
+        })
+    })
+</script>
+</html>

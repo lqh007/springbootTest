@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=EDGE;IE=9">
+    <title>springBoot登录平台</title>
+    <link rel="stylesheet" href="../../../common/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../../../common/css/login.css"/>
+
+</head>
+<body>
+<div class="main">
+    <div class="dialogDiv" style="height: 460px;">
+        <img src="../../../common/images/login/e.png"/>
+        <!--<h4 style="color: #1a1a1a; font-size:30px;">springBoot登录平台</h4>-->
+        <form class="form-horizontal" id="formID" method="post" action="loginValidate">
+            <div class="form-group">
+                <label class="control-label zhbg">账&nbsp;号</label>
+                <input type="text" id="account" name="account" class="form-control">
+            </div>
+            <p class="tiper" id="accountError"></p>
+            <div class="form-group">
+                <label class="control-label mmbg">密&nbsp;码</label>
+                <input type="password" id="password" name="password" class="form-control" autocomplete="off">
+            </div>
+            <div class="bb">
+                <button type="button" id="submitt" class="btn btn-success lg">登&nbsp;&nbsp;&nbsp;录</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+<script src="../../../itsoftui/plugins/jquery.min.js"></script>
+<script type="text/javascript" src="../../../itsoftui/plugins/layer/lay/dest/layui.all.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#submitt").click(function (e) {
+            var account = $("#account").val();
+            if (account.length <= 0) {
+                $("#account").focus();
+                $("#accountError").empty().html("请输入账号").show();
+                return false;
+            } else {
+                $("#accountError").empty().hide();
+            }
+            var password = $("#password").val();
+            if (password.length <= 0) {
+                $("#password").focus();
+                $("#pwdError").empty().html("请输入密码").show();
+                return false;
+            } else {
+                $("#pwdError").empty().hide();
+            }
+            e.preventDefault();
+            layer.msg('努力登录中.....');
+            $(this).attr("disabled", "disabled");
+            $.ajax({
+                type: "POST",
+                url: "loginValidate",
+                data: "name=John&location=Boston",
+                success: function(msg){
+                   window.location.href= "index";
+                }
+            });
+        });
+        $(".form-control").focus(function (e) {
+            $(this).parent("div").addClass("formgroupfocus");
+        });
+        $(".form-control").blur(function (e) {
+            $(this).parent("div").removeClass("formgroupfocus");
+        });
+        $("body").keypress(function (e) {
+            if (e.which == 13) {
+                $("#submitt").click();
+            }
+        });
+    });
+
+    function refreshCaptcha() {
+        $("#captchaImg").attr("src", "<%=basePath %>/captcha?t=" + Math.random());
+    }
+</script>
+</html>

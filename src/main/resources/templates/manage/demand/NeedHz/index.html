@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>需求汇总</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            margin-top: 5px;
+        }
+        .moduleType label{
+            color: #333;
+            font-weight: 400;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        .editBtn{
+            cursor: pointer;
+            color: #2e8ded;
+        }
+        .selectrow .editBtn{
+            color: #fff!important;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划->需求汇总</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <!--选择库房-->
+                <span style="color: #333;float: left;line-height: 44px">库房：</span>
+                <div class="dropdownlist" id="warehouse" name="warehouse" style="float: left;margin-right: 50px"></div>
+                <!--供应时间-->
+                <div style="float: left;line-height: 44px;margin-right: 50px">
+                    <span style="color: #333;float: left">供应日期：</span>
+                    <div id="timeBtn" class="btnop" style="float: left" >
+                        <span data="all" class="yj2 ">全部</span>
+                        <span data="0" class="yj2 on">本月</span>
+                        <span data="1" class="yj2">本周</span>
+                        <span data="2" class="yj2">昨天</span>
+                        <span data="3" class="yj2">今天</span>
+                        <span data="4" class="yj2">明天</span>
+                    </div>
+                    <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                        <input type="text" class= "form-control" name="gyTime" id="gyTime"  style="width: 240px" placeholder="输入或选择日期">
+                        <span class="caret" style="right: 17px"></span >
+                    </div>
+                </div>
+                <div  class="btnop" style="float: left;margin-left: 50px">
+                    <span data="all" class="yj2 on" id="AllBtn">需求汇总</span>
+                </div>
+            </div>
+            <div class="itsoft-toolbar" style="border-top: 0">
+                <div class="orderBox" style="float: left;line-height: 45px;">
+                    <span style="color: #333">状态：</span>
+                    <div  class="btnop orderType">
+                        <span data="0" class="yj2 on">全部</span>
+                        <span data="1" class="yj2">待上报</span>
+                        <span data="2" class="yj2">待审批</span>
+                        <span data="3" class="yj2">已审批</span>
+                    </div>
+                </div>
+                <div class="notBox" style="float: left;line-height: 45px;margin-left: 50px">
+                    <div  class="moduleType" style="float:left;">
+                        <label data="0">
+                            <img src="../../../../../../common/images/huizong.png">
+                            <span style="color: #2e8ded">未汇总--按单据统计</span>
+                            <span style="color: #2e8ded">(<em style="color: red">5</em>)</span>
+                        </label>
+                        <label data="1">
+                            <img src="../../../../../../common/images/huizong.png">
+                            <span style="color: #2e8ded">未汇总--按原料统计</span>
+                            <span style="color: #2e8ded">(<em style="color: red">12</em>)</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="itsoft-datagrid" id="datagrid" style="border-top: 0">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagridIndex;
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //库房
+        $('#warehouse').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //时间选择
+        $('#timeBtn').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagridIndex.refreshData(0)
+        });
+      //双日历
+      SetDateRangePicker('gyTime', function(start, end, label) {
+        console.log(
+          start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD')
+        );
+      });
+
+
+        //状态
+        $('.orderType').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagridIndex.refreshData(0)
+        });
+
+        //列表
+      datagridIndex=$('#datagrid').datagrid({
+        keyField: "orderid",
+        page:true,
+        url: '../../../../../../data/XQHZ.json',
+        type: 'GET',
+        line: "both",
+        isSequence: true,
+        singleSelect: true,
+        eventrow: false,
+        click: function() {
+
+        },
+        dblclick: function() {
+           var row=datagridIndex.getSelectedRow();
+           var key=row.find('[field=edit]').find('span').attr('data-type');
+           editRow(key)
+        },
+        columns:[
+          {
+            field:'id',
+            isshow:false
+          },{
+            title: '状态',
+            field: 'state',
+            align: "center",
+            width: '120',
+            formatter:function (val) {
+              if(val=='待上报'){
+                return '<span class="state" style="color: red;">待上报</span>'
+              }
+              if(val=='待审批'){
+                return '<span class="state" style="color: #2e8ded;">待审批</span>'
+              }
+            }
+          },
+          {
+            title: '汇总单号',
+            field: 'numId',
+            align: "center",
+            width: '140',
+            formatter:function () {
+              return 'XQ201803040000'
+            }
+          },
+          {
+            title: '汇总类型',
+            field: 'HZLX',
+            align: "center",
+            width: '100',
+            formatter:function (val) {
+              return '<span>'+val+'</span>'
+            }
+          },
+          {
+            title: '汇总原料类别',
+            field: 'HZYLLB',
+            align: "center",
+            width: '100',
+            formatter:function () {
+              return '主食类'
+            }
+          },
+          {
+            title: '供应日期',
+            field: 'SupplyTime',
+            align: "center",
+            width: '130',
+            formatter:function () {
+              return '2018-03-03'
+            }
+          },
+          {
+            title: '汇总人',
+            field: 'HZR',
+            align: "center",
+            width: '100',
+            formatter:function () {
+              return '王大锤'
+            }
+          },
+          {
+            title: '汇总时间',
+            field: 'reportTime',
+            align: "center",
+            width: '150',
+            formatter:function () {
+              return '2018-03-04 15:12'
+            }
+          },
+          {
+            title: '审批人',
+            field: 'HZR',
+            align: "center",
+            width: '100',
+            formatter:function () {
+              return '张益达'
+            }
+          },
+          {
+            title: '审批时间',
+            field: 'reportTime',
+            align: "center",
+            width: '150',
+            formatter:function () {
+              return '2018-03-05 15:12'
+            }
+          },
+          {
+            title: '编辑',
+            field: 'edit',
+            align: "center",
+            width: '80',
+            formatter:function (i,v,o) {
+                if(o.status==2){
+                  return '<span class="iconfont editBtn iconfont-dayinji" data-type="'+o.type+'"></span>'
+                }else {
+                  return '<span class="iconfont editBtn iconfont-edit" data-type="'+o.type+'"></span>'
+                }
+            }
+          },{
+            title: '',
+            field: 'remark',
+            align: "center",
+            width: '50',
+            widthfix:true
+          }
+        ]
+
+      });
+      datagridIndex.loadData()
+
+        //点击需求汇总
+        $('#AllBtn').on('click',function () {
+             ITSOFT.itWin.open({
+                 title:'需求汇总',
+                 area:['450px','350px'],
+                 content:['XqHz.html','no']
+             });
+        });
+
+        //未汇总类别
+        $('.moduleType').on('click','label',function () {
+            var key=$(this).attr('data');
+            var url='';
+            if(key==0){
+                 url='WHZ_dj.html'
+            }else {
+                 url='WHZ_yl.html'
+            }
+            ITSOFT.itWin.open({
+               full:true,
+               content:[url,'no'],
+               closeBtn:0
+            })
+        });
+
+
+        //编辑汇总
+        $('#datagrid').on('click','.editBtn',function () {
+             var key=$(this).attr('data-type');
+             editRow(key)
+        });
+
+        function editRow(key) {
+          var url='';
+          if(key==2){
+            url='HZSB_bz.html'
+          }else {
+            url='HZSB_yl.html'
+          }
+          ITSOFT.itWin.open({
+            full:true,
+            content:[url,'no'],
+            closeBtn:0
+          })
+        }
+
+
+
+
+    })
+</script>
+</html>

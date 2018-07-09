@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>采购入库</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .dropdownlist{
+            border:1px solid #ccc;
+            float: left;
+            margin-top: 5px;
+        }
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+ <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">采购管理->采购入库</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <span style="font-size: 16px;color: #333;float: left;line-height: 44px">库房：</span>
+                <div class="dropdownlist" id="restaurant" name="restaurant"></div>
+                <div id="toolBtn"></div>
+            </div>
+            <div class="itsoft-toolbar" style="border-top: 0">
+                <div style="float: left;line-height: 45px;margin-right: 50px">
+                    <span style="font-size: 16px;color: #333;float: left">供应时间：</span>
+                    <div id="toolbarbtnop1" class="btnop" style="float: left" >
+                        <span data="0" class="yj2 on">全部</span>
+                        <span data="0" class="yj2">本月</span>
+                        <span data="1" class="yj2">本周</span>
+                    </div>
+                    <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                        <input type="text" class= "form-control" name="gyTime" id="gyTime"  style="width: 240px" placeholder="输入或选择日期">
+                        <span class="caret" style="right: 17px"></span >
+                    </div>
+                </div>
+                <div style="float: left;line-height: 45px">
+                    <span style="font-size: 16px;color: #333">状态：</span>
+                    <div id="toolbarbtnop" class="btnop" >
+                        <span data="all" class="yj2 on">全部</span>
+                        <span data="1" class="yj2">草稿</span>
+                        <span data="2" class="yj2">审核</span>
+                        <span data="2" class="yj2">结算</span>
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    $(function () {
+
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅状态下拉
+        $('#restaurant').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择餐库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+
+        //双日历
+        SetDateRangePicker('gyTime', function(start, end, label) {
+            console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+
+
+        //操作按钮
+        $('#toolBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'新建需求单',
+                    title:'新建需求单',
+                    width:'120px',
+                    icon:"iconfont-add",
+                    click:function () {
+                        addNewPage()
+                    }
+                }
+            ]
+        });
+        var datagrid = $('#datagrid').datagrid({
+            keyField: "orderid",
+            page:true,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+                loadPage()
+            },
+            columns:[
+                {
+                    field:'id',
+                    isshow:false
+                },{
+                    title: '状态',
+                    field: 'state',
+                    align: "center",
+                    width: '120',
+                    formatter:function () {
+                        return '未上报'
+                    }
+                },
+                {
+                    title: '单据号',
+                    field: 'numId',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return 'XQSP0123'
+                    }
+                },
+                {
+                    title: '供应商',
+                    field: 'type',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '学子食府'
+                    }
+                },
+                {
+                    title: '入库日期',
+                    field: 'SupplyTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '制单人',
+                    field: 'reportUser',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '张大炮'
+                    }
+                },
+                {
+                    title: '制单时间',
+                    field: 'reportTime',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-4'
+                    }
+                },
+                {
+                    title: '审核人',
+                    field: 'auditUser',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '李亮亮'
+                    }
+                },
+                {
+                    title: '审核时间',
+                    field: 'auditUser',
+                    align: "center",
+                    width: '100',
+                    formatter:function () {
+                        return '2018-3-3'
+                    }
+                },
+                {
+                    title: '操作',
+                    field: 'editTime',
+                    align: "center",
+                    width: '130',
+                    formatter:function (row,i,o) {
+                        if(o.status==1){
+                            return '<span class="iconfont handle iconfont-edit" data-type="1"></span>';
+
+                        }else {
+                            return '<span class="iconfont  handle iconfont-dayinji" data-type="2"></span>';
+                        }
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remark',
+                    align: "left",
+                    width: '100',
+                    widthfix:true,
+                    formatter:function () {
+                        return ''
+                    }
+                },
+            ]
+        });
+        datagrid.loadData();
+
+        $('.btnop').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagrid.refreshData(0)
+        });
+
+        //新建需求单
+        function addNewPage() {
+            ITSOFT.itWin.open({
+                title:'',
+                full:true,
+                content:['./yans.html','no'],
+                closeBtn:0
+            })
+        };
+        //编辑需求单
+        $('#datagrid').on('click','.handle',function () {
+            var elem=$(this).attr('data-type');
+            editReport(elem)
+        });
+        var href;
+        function editReport(elem) {
+            elem==1?
+                href='editReport.html'
+                :
+                href='printReport.html';
+            ITSOFT.itWin.open({
+                full:'true',
+                content:href,
+                closeBtn:0
+            })
+        }
+
+        //需求计划单
+       function loadPage() {
+          ITSOFT.itWin.open({
+              full:true,
+              content:'NeedJhd.html',
+              closeBtn:0
+          })
+       }
+    });
+</script>
+</html>

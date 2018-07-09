@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>新建需求上单</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../itsoftui/plugins/pikaday/pikaday.css" />
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .handle{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .handle{
+            color: #fff;
+        }
+        .timeBtn span{
+            margin-top: 0;
+        }
+        .table-search-menu{
+            width: 660px!important;
+        }
+        .tip{
+            color: #aa1111;
+        }
+        .orderlog{
+            position: absolute;
+            height: 125px;
+            overflow-y: auto;
+            right: 2px;
+            line-height: 25px;
+            top: 0px;
+            width: 460px;
+        }
+        .line-row{
+            margin:15px 0;
+            position: relative;
+        }
+        .cause{
+            vertical-align: top;
+            display: inline-block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        .line{
+            width: 2px;
+            background-color: #2e8ded;
+            position: absolute;
+            top:18px;
+            left:129px;
+            height: 27px;
+            z-index: 6666;
+        }
+        .stateName{
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            text-align: center;
+            /*border-radius: 50%;*/
+            background-color: #fb9c40;
+            position: absolute;
+            top: 15px;
+            right: 10px;
+            color: #2e8ded;
+        }
+        .stateName p{
+            height: 20%;
+            color: #fff;
+        }
+        .stateName img{
+            margin-top: -25px;
+        }
+    </style>
+</head>
+<body>
+<div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划单审批（馨苑食府）</p>
+        <p id="closeBtn" style="float: right;"></p>
+        <div id="SpBtn" style="float: right"></div>
+    </div>
+    <div class="wrap-bd" style="background-color: #fff">
+        <div class="itsoft-panel">
+            <div style="position: relative">
+                <form id="addform" class="form form-horizontal" action="ajaxOperation.ashx?Action=formUpload" method="post" enctype="multipart/form-data" style="width:665px;position: relative">
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 90px;">单据号：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <input type="text" name="gysname" value="XQ20180306" readonly class="form-control">
+                        </div>
+                        <label class=" col-md-1  control-label" style="width: 90px;">需求单位：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <input type="text" name="gysname" value="学子食府" readonly class="form-control">
+                        </div>
+
+                    </div>
+                    <div class=" row form-group">
+                        <label class="col-md-1 control-label" style="width: 90px;">到货时间：</label>
+                        <div class="col-md-1" style="width: 200px;">
+                            <input type="text"  name="gyTime" value="2018-03-10" readonly class="form-control">
+                        </div>
+                        <label class=" col-md-1  control-label" style="width: 90px;">库房：</label>
+                        <div class="col-md-1 " style="width: 200px;">
+                            <input type="text"  name="gyTime" value="一号库房" readonly class="form-control">
+                        </div>
+                    </div>
+                    <div class=" row form-group">
+                        <label class=" col-md-1  control-label" style="width: 90px;">备注：</label>
+                        <div class="col-md-1 " style="width: 490px;">
+                            <input type="text" name="bz" placeholder="备注信息" disabled class="form-control">
+                        </div>
+                    </div>
+                    <div class="stateName">
+                        <p>
+                            <img src="../../../../../../common/images/shenpi.png">
+                        </p>
+                        <p>上报</p>
+                    </div>
+                </form>
+                <div id="orderlog" class="orderlog">
+                    <div class="line-box">
+                        <div class="line-row">
+                            <span>2018-02-01 10:10</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                        <div class="line-row">
+                            <span>2018-02-06 09:20</span>
+                            <span class="iconfont iconfont-gouxuan2" style="color: #2e8ded"></span>
+                            <span>上报计划</span>
+                            <span class="cause" title="我是提示">管理员</span>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" style="border-top: 0">
+                <div id="datagrid"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/pikaday/pikaday.js" type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    $(function () {
+
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //审批
+        $('#SpBtn').toolbarbtn({
+            btn:[{
+                text:'审批',
+                title:'审批',
+                icon:'iconfont-fabu',
+                click:function () {
+                    approvalRow()
+                }
+            }]
+        });
+       //列表
+      datagrid = $('#datagrid').datagrid({
+            keyField: "id",
+            page:false,
+            url: '../../../../../../data/order.json',
+            type: 'GET',
+            line: "both",
+            isSequence: true,
+            singleSelect: true,
+            eventrow: false,
+            click: function() {
+
+            },
+            dblclick: function() {
+
+            },
+            columns:[
+              {
+                  field:'id',
+                  isshow:false
+              },{
+                title: '<a title="添加行" class="iconfont listbtn addrow iconfont-add"></a>',
+                width: '30',
+                formatter: function(val, i) {
+                  return '<a title="删除行" class="iconfont listbtn delrow iconfont-del"></a>';
+                }
+              },{
+                  title: '编码',
+                  field: 'rawBm',
+                  align: "center",
+                  width: '120',
+                  formatter:function () {
+                      return 'XQ20180306'
+                  }
+              },
+              {
+                  title: '原料名称',
+                  field: 'rawName',
+                  align: "center",
+                  width: '100',
+                  formatter:function () {
+                      return '大米'
+                  }
+              },
+              {
+                  title: '原料类别',
+                  field: 'rawType',
+                  align: "center",
+                  width: '100',
+                  formatter:function () {
+                      return '主食'
+                  }
+              },
+              {
+                  title: '规格',
+                  field: 'unit',
+                  align: "center",
+                  width: '100',
+                  formatter:function () {
+                      return '5KG'
+                  }
+              },
+              {
+                  title: '单位',
+                  field: 'rawDw',
+                  align: "center",
+                  width: '80',
+                  formatter:function () {
+                      return '袋'
+                  }
+              },
+              {
+                  title: '品牌',
+                  field: 'rawPP',
+                  align: "center",
+                  width: '100',
+                  formatter:function () {
+                      return '金龙鱼'
+                  }
+              },
+              {
+                  title: '需求量',
+                  field: 'XQNum',
+                  align: "center",
+                  width: '100',
+                  formatter:function () {
+                      return '30'
+                  }
+              },
+              {
+                  title: '备注',
+                  field: 'remark',
+                  align: "left",
+                  width: '100',
+                  widthfix:true,
+                  formatter:function () {
+                      return ''
+                  }
+              }
+          ]
+        });
+        datagrid.loadData();
+
+        //审批
+        function approvalRow() {
+            ITSOFT.itWin.open({
+               title:'审批',
+               area:['400px','250px'],
+               content:['spRow.html','no']
+            })
+        }
+    })
+</script>
+</html>

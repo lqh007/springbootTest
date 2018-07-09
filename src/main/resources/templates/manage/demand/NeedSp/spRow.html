@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>审批</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .wrap{
+            margin: 15px 0 0 15px;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <form id="addform">
+            <div class="form-group row">
+                 <label class="control-label">审批：</label>
+                 <div style="width: 200px;margin-top: 5px">
+                     <div class="radio-box">
+                         <input type="radio" id="radio-1" name="demo-radio1" checked>
+                         <label for="radio-1">通过</label>
+                     </div>
+                     <div class="radio-box">
+                         <input type="radio" id="radio-2" name="demo-radio1">
+                         <label for="radio-2">驳回</label>
+                     </div>
+                 </div>
+            </div>
+            <div class="form-group row">
+                 <label class="control-label">备注：</label>
+                 <div style="width: 290px">
+                     <textarea class="form-control" value="" name="" style="height: 80px"></textarea>
+                 </div>
+            </div>
+        </form>
+        <div class="btnBox">
+            <div>
+                <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+                <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/jQuery.form.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script src="../../../../../../itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" ></script>
+<script src="../../../../../../itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+   $(function () {
+     $('.radio-box input').iCheck({
+       checkboxClass: 'icheckbox-blue',
+       radioClass: 'iradio-blue',
+       increaseArea: '20%'
+     });
+     //验证
+     $("#addform").validate({
+       rules: {
+         gysname: {
+           required: true,
+           minlength: 2,
+           maxlength: 20
+         },
+         ddlSelecttext: {
+           required: true
+         },
+         srl: {
+           date: true
+         }
+       },
+       onkeyup: false,
+       focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+       success: "valid",
+       submitHandler: function(form) {
+         $(form).ajaxSubmit({
+           success: function(data) {
+
+           },
+           error: function(XmlHttpRequest, textStatus, errorThrown) {
+
+           }
+         });
+       }
+     });
+     $("#btn-ok").on('click', function(event) {
+       $("#addform").submit();
+     });
+     $("#btn-cancel").on('click', function(event) {
+         parent.ITSOFT.itWin.close(index)
+     });
+
+   })
+</script>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>卡机管理</title>
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css"
+          th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/plugins/icheck/icheck.css"
+          th:href="@{${root}+'/itsoftui/plugins/icheck/icheck.css'}">
+    <link rel="stylesheet" href="../../../../static/common/css/indexBase.css"
+          th:href="@{${root}+'/common/css/indexBase.css'}">
+    <link rel="stylesheet" href="../../../../static/itsoftui/css/itsoftui.css"
+          th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+
+    <style>
+        .wrap {
+            height: 100%;
+            background-color: #f2f2f2;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .dropdownlist {
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+
+        .wrapLt {
+            float: left;
+            width: 400px;
+            border-right: 1px solid #ccc;
+        }
+
+        .wrapRt {
+            margin-left: 405px;
+        }
+
+        .typeName {
+            line-height: 45px;
+            font-weight: 700;
+            float: left;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">系统管理->卡机管理</p>
+        <p id="closeBtn" style="float: right; "></p>
+    </div>
+    <div class="wrap-bd" style="background-color: #fff">
+        <div class="itsoft-panel">
+            <!--班组-->
+            <div class="wrapLt">
+                <div class="itsoft-toolbar">
+                    <div class="typeName">餐厅</div>
+                    <div class="dropdownlist" id="selectCT" name="selectCT" style="float: left"></div>
+                    <div id="toolSearch" style="float: right"></div>
+
+                </div>
+                <div id="teamGrid"></div>
+            </div>
+            <!--卡机-->
+            <div class="wrapRt">
+                <div class="itsoft-toolbar">
+                    <div class="typeName">卡机</div>
+                    <div id="toolCardBtn" style="float: right"></div>
+                </div>
+                <div id="datagrid"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js"
+        th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js"
+        th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/icheck/jquery.icheck.min.js"
+        th:src="@{${root}+'/itsoftui/plugins/icheck/jquery.icheck.min.js'}"></script>
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+    var typeName = '';
+    var teamId = '';
+    var teamGrid;
+    var datagrid;
+    var loadingindex;
+    var index = parent.layer.getFrameIndex(window.name);
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '',
+                    title: '关闭',
+                    width: '35px',
+                    icon: 'iconfont-close',
+                    click: function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //餐厅下拉
+        var CTSel = $('#selectCT').dropdownlist({
+            type: 'post',
+            dataurl: '[[${root}]]/api/v2/dining/manage/diningRestaurant/diningRestaurantRolesSelect',
+            width: '160px',
+            placeholder: '请选择餐厅',
+            autoLoad: true,
+            changeEvent: function (val, text) {
+                if (typeName != val) {
+                    typeName = val;
+                    var queryParams = {};
+                    queryParams.restaurantId = val;
+                    teamGrid.refreshData(queryParams);
+                    datagrid.refreshData({teamId: ""});
+                }
+            }
+        });
+        //班组搜索
+        $('#toolSearch').toolbarsearch({
+            width: '120px',
+            placeholder: '班组名称',
+            searchEvent: function (val) {
+                var queryParams = {searchValue: val};
+                teamGrid.refreshData(queryParams);
+                datagrid.refreshData({teamId: ""});
+            }
+        })
+
+        //班组列表
+        teamGrid = $('#teamGrid').datagrid({
+            keyField: "orderid",
+            page: false,
+            url: '[[${root}]]/api/v2/dining/manage/diningRestaurantTeam/diningRestaurantTeamRolesList',
+            type: 'post',
+            line: "both",
+            isSequence: true,
+            queryParams: {restaurantId: CTSel.getValueText().value},
+            singleSelect: true,
+            eventrow: false,
+            click: function () {
+                var selectedRows = teamGrid.getSelectedRow();
+                teamId = teamGrid.getColumn(selectedRows, 'id');
+                var queryParams = {};
+                queryParams.teamId = teamId;
+                datagrid.refreshData(queryParams);
+            },
+            dblclick: function () {
+
+            },
+            loadend: function (queryParams) {
+                // datagrid.iCheck()
+            },
+            columns: [
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '班组名称',
+                    field: 'teamName',
+                    align: "left",
+                    width: '180',
+                    formatter: function () {
+
+                    }
+                },
+                {
+                    title: '所属餐厅',
+                    field: 'restaurantName',
+                    align: "left",
+                    width: '100',
+                    widthfix: true,
+                    formatter: function () {
+
+                    }
+                }
+            ]
+        });
+
+        teamGrid.loadData(0);
+
+
+        /***
+         *   卡机
+         * ***/
+
+        $('#toolCardBtn').toolbarbtn({
+            btn: [
+                {
+                    text: '添加',
+                    title: '添加',
+                    icon: 'iconfont-add',
+                    click: function () {
+                        addRow()
+                    }
+                }, {
+                    text: '删除',
+                    title: '删除',
+                    icon: 'iconfont-del2',
+                    click: function () {
+                        delRows()
+                    }
+                }
+            ]
+        });
+        //卡机列表
+        datagrid = $('#datagrid').datagrid({
+            keyField: "id",
+            page: false,
+            url: '[[${root}]]/api/v2/dining/manage/diningRestaurantTeamCard/diningRestaurantTeamCardList',
+            type: 'post',
+            line: "both",
+            isSequence: true,
+            queryParams: {teamId: teamId},
+            singleSelect: false,
+            eventrow: false,
+            click: function () {
+
+            },
+            dblclick: function () {
+
+            },
+            columns: [
+                {
+                    field:'id',
+                    isshow:false
+                },
+                {
+                    title: '卡机名称',
+                    field: 'cardName',
+                    align: "left",
+                    width: '180',
+                    formatter: function () {
+
+                    }
+                },
+                {
+                    title: '卡机编号',
+                    field: 'cardNumber',
+                    align: "center",
+                    width: '150',
+                    formatter: function () {
+
+                    }
+                },
+                {
+                    title: '备注',
+                    field: 'remarks',
+                    align: "left",
+                    width: '100',
+                    widthfix: true,
+                    formatter: function () {
+
+                    }
+                },
+            ]
+        });
+
+        datagrid.loadData(0);
+
+
+        //添加卡机
+        function addRow() {
+            var selectedRows = teamGrid.getSelectedRow();
+            var id = teamGrid.getColumn(selectedRows,'id');
+            if (selectedRows.length == 0) {
+                ITSOFT.tools.showMsg("error", "请选择要设置的班组");
+                return false;
+            }
+            ITSOFT.itWin.open({
+                title:'添加卡机',
+                area:['550px','400px'],
+                content:['[[${root}]]/redirect/system/addCard?teamId='+teamId,'no']
+            })
+        }
+
+        //删除卡机
+        function delRows() {
+            //获取选中行
+            var selectedRows = datagrid.getSelectedRows();
+            if(selectedRows.length == 0) {
+                ITSOFT.tools.showMsg("error", "请选择要删除的行");
+                return false;
+            }
+            var msgtxt = "确定要删除";
+            if(selectedRows.length > 1) {
+                msgtxt += "[选择的" + selectedRows.length + "条数据]吗？";
+            } else {
+                //提示字段要修改
+                msgtxt += "[" + datagrid.getColumnText(selectedRows[0], "cardName") + "]吗？";
+            }
+            ITSOFT.itWin.confirm(msgtxt, function() {
+                //在这里执行相关操作,可以批量传递key数组，也可以遍历分别操作
+                ITSOFT.dataAjax({
+                    url: '[[${root}]]/api/v2/dining/manage/diningRestaurantTeamCard/deleteDiningRestaurantTeamCard',
+                    type: 'post',
+                    data: {ids:selectedRows},
+                    async: false,
+                    beforeSend: function () {
+                        loadingindex = ITSOFT.itWin.msg("正在提交数据",16);
+                    },
+                    success: function (data) {
+                        ITSOFT.itWin.close(loadingindex);
+                        if (data.errorCode == 0) {
+                            ITSOFT.tools.showMsg("ok", "已删除");
+                            $(selectedRows).each(function(i,val) {
+                                //执行成功后删除datagrid数据
+                                datagrid.deleteRow(val);
+                            });
+                        } else {
+                            ITSOFT.tools.showMsg("error", data.message);
+                            return false;
+                        }
+                    },
+                    error: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                        ITSOFT.tools.showMsg("error", data.message);
+                    },
+                    complete: function () {
+                        ITSOFT.itWin.close(loadingindex);
+                    }
+                });
+            });
+        }
+
+
+    })
+</script>
+</html>

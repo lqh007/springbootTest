@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+    <title>采购审批</title>
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker-bs3.css"  />
+    <link rel="stylesheet" href="../../../../../../itsoftui/plugins/icheck/icheck.css">
+    <link rel="stylesheet" href="../../../../../../common/css/indexBase.css">
+    <link rel="stylesheet" href="../../../../../../itsoftui/css/itsoftui.css">
+    <style>
+        .warehouse{
+            border:1px solid #ccc;
+            margin-top: 5px;
+        }
+        .moduleType label{
+            color: #333;
+            font-weight: 400;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+        .approval{
+            color: #2e8ded;
+            cursor: pointer;
+        }
+        .selectrow .approval{
+            color: #fff;
+        }
+        .selectrow .itemRow{
+            color: #fff!important;
+        }
+    </style>
+</head>
+<body>
+   <div class="pd-10 wrap">
+    <div class="wrap-top">
+        <p style="color: #737373;float: left;">需求计划->采购审批</p>
+        <p id="closeBtn" style="float: right;"></p>
+    </div>
+    <div class="wrap-bd">
+        <div class="itsoft-panel">
+            <div class="itsoft-toolbar">
+                <!--选择库房-->
+                <span style="color: #333;float: left;line-height: 44px">库房：</span>
+                <div class="dropdownlist warehouse" id="warehouse" name="warehouse" style="float: left;margin-right: 50px"></div>
+                <!--供应时间-->
+                <div style="float: left;line-height: 44px;margin-right: 50px">
+                    <span style="color: #333;float: left">供应日期：</span>
+                    <div id="timeBtn" class="btnop" style="float: left" >
+                        <span data="1" class="yj2 on">本周</span>
+                        <span data="2" class="yj2">昨天</span>
+                        <span data="3" class="yj2">今天</span>
+                        <span data="4" class="yj2">明天</span>
+                    </div>
+                    <div class="control-cal" style="float: left;position: relative;margin-top: 5px">
+                        <input type="text" class= "form-control" name="datepicker" id="datepicker"  style="width: 240px" placeholder="输入或选择日期">
+                        <span class="caret" style="right: 17px"></span >
+                    </div>
+                </div>
+            </div>
+            <div class="itsoft-datagrid" id="datagrid" style="border-top: 0"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../../../../../itsoftui/plugins/jquery-1.12.4.js"></script>
+<script src="../../../../../../itsoftui/plugins/layer/layer.js"></script>
+<script src="../../../../../../itsoftui/plugins/icheck/jquery.icheck.min.js"></script>
+<script src="../../../../../../itsoftui/plugins/moment.min.js" type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/daterangepicker.js"  type="text/javascript"></script>
+<script src="../../../../../../itsoftui/plugins/bootstrap-3.3.5-dist/date.js"  type ="text/javascript"></script>
+<script src="../../../../../../itsoftui/js/itsoftui.js"></script>
+<script>
+    var index=parent.layer.getFrameIndex(window.name);
+    var datagrid;
+    $(function () {
+        //关闭按钮
+        $('#closeBtn').toolbarbtn({
+            btn:[
+                {
+                    text:'',
+                    title:'关闭',
+                    width:'35px',
+                    icon:'iconfont-close',
+                    click:function () {
+                        parent.ITSOFT.itWin.close(index);
+                    }
+                }
+            ]
+        });
+        //库房
+        $('#warehouse').dropdownlist({
+            dataurl:'../../../../../../data/select.json',
+            placeholder:'请选择库房',
+            width:'160px',
+            changeEvent:function (val,text) {
+
+            }
+        });
+        //时间选择
+        $('#timeBtn').on('click','span',function () {
+            $(this).addClass('on').siblings().removeClass('on');
+            datagrid.refreshData(0)
+        });
+      //双日历
+      SetDateRangePicker('datepicker', function(start, end, label) {
+        console.log(start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'))
+      });
+
+
+      //列表
+      datagrid=$('#datagrid').datagrid({
+        keyField: "orderid",
+        page:true,
+        url: '../../../../../../data/CGSP.json',
+        type: 'GET',
+        line: "both",
+        isSequence: true,
+        singleSelect: true,
+        eventrow: false,
+        click: function() {
+
+        },
+        dblclick: function() {
+          var row=datagrid.getSelectedRow()
+          var key=row.find('[field=SP]').find('span').attr('data');
+          console.log(key);
+          approvalRow(key)
+        },
+        columns:[
+          {
+            field:'id',
+            isshow:false
+          },
+          {
+            title: '状态',
+            field: 'state',
+            align: "center",
+            width: '100',
+            formatter:function (val) {
+              if(val=='待审批'){
+                return '<span class="itemRow" style="color: red">待审批</span>'
+              }
+            }
+          },
+          {
+            title: '汇总单号',
+            field: 'HZDH',
+            align: "center",
+            width: '140',
+            formatter:function () {
+              return 'hz201825021001'
+            }
+          },
+          {
+            title: '汇总类型',
+            field: 'HZLX',
+            align: "center",
+            width: '140',
+            formatter:function (val) {
+              return '<span>'+val+'</span>'
+            }
+          },
+          {
+            title: '原料驳回',
+            field: 'YLBH',
+            align: "center",
+            width: '80',
+            formatter:function (val) {
+              if(val!=''){
+                return '<span class="itemRow" style="color: red">'+val+'</span>'
+              }else {
+                return '<span class="itemRow">0</span>'
+              }
+            }
+          },
+          {
+            title: '供应日期',
+            field: 'XQDW',
+            align: "center",
+            width: '140',
+            formatter:function () {
+              return '2018-05-26'
+            }
+          },
+          {
+            title: '汇总人',
+            field: 'YLBM',
+            align: "center",
+            width: '100',
+            formatter:function () {
+              return '张依依'
+            }
+          },
+          {
+            title: '汇总时间',
+            field: 'YLMC',
+            align: "center",
+            width: '140',
+            formatter:function () {
+              return '2018-05-28 10:12'
+            }
+          },{
+            title: '审批',
+            field: 'SP',
+            align: "center",
+            width: '80',
+            formatter:function (i,r,o) {
+              return '<span class="iconfont approval iconfont-feedback2" data="'+o.type+'"></span>'
+            }
+          },
+          {
+            title: '备注',
+            field: 'remark',
+            align: "left",
+            width: '50',
+            widthfix:true,
+            formatter:function () {
+              return ''
+            }
+          }
+        ]
+
+      })
+      datagrid.loadData()
+
+      //审批
+     $('#datagrid').on('click','.approval',function () {
+         var key=$(this).attr('data');
+         approvalRow(key)
+     });
+      function approvalRow(key) {
+          var url=''
+          if(key==2){
+            url='approval_bz.html'
+          }else {
+            url='approval_yl.html'
+          }
+          ITSOFT.itWin.open({
+            full:true,
+            content:[url,'no'],
+            closeBtn:0
+          })
+      }
+
+
+    })
+</script>
+</html>

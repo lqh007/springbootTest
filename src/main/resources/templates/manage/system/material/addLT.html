@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+    <title>添加原料类别</title>
+    <link rel="stylesheet" href='../../../../static/itsoftui/plugins/bootstrap/css/bootstrap.css' th:href="@{${root}+'/itsoftui/plugins/bootstrap/css/bootstrap.css'}">
+    <link rel="stylesheet" href='../../../../static/itsoftui/css/itsoftui.css' th:href="@{${root}+'/itsoftui/css/itsoftui.css'}">
+    <style>
+        .wrap{
+            padding-top: 15px;
+            padding-left: 15px;
+        }
+        .btnBox{
+            width: 100%;
+            height: 50px;
+            background-color: #F8F8F8;
+            border-top: 1px solid #eee;
+            position: fixed;
+            left: 0;
+            bottom:0px;
+        }
+        .btnBox>div{width: 200px;height: 100%;margin:0 auto;padding-top: 10px;}
+        #btn-ok{float: left;margin: 0;}
+        #btn-cancel{float: right;margin: 0;}
+    </style>
+</head>
+<body>
+   <div class="wrap">
+       <form id="addform" th:action="@{${root}+'/api/v2/dining/manage/diningMaterialType/insertOrUpdateDiningMaterialType'}" method="post" th:object="${materialType}">
+           <input type="hidden" name="id" th:value="${materialType.id}">
+           <input type="hidden" name="parentId" th:value="${materialTypeId}">
+           <div class="form-group row">
+                <label class="control-label">上一级：</label>
+               <div style="width: 300px">
+                   <input type="text" name="" th:value="${materialTypeName}"  readonly class="form-control">
+               </div>
+           </div>
+           <div class="form-group row">
+                <label class="control-label"><em style="color: red;margin-right:5px">*</em>编码：</label>
+               <div style="width: 300px;position: relative">
+                   <input type="text" name="number" th:value="${materialType.number}" placeholder="请填写"  class="form-control isFloat">
+               </div>
+           </div>
+           <div class="form-group row">
+                <label class="control-label"><em style="color: red;margin-right:5px">*</em>名称：</label>
+               <div style="width: 300px;position: relative">
+                   <input type="text" name="name" th:value="${materialType.name}"  placeholder="请填写"  class="form-control">
+               </div>
+           </div>
+           <div class="form-group row">
+                <label class="control-label">序号：</label>
+               <div style="width: 300px;position: relative">
+                   <input type="text" name="orderNo" th:value="${materialType.orderNo}" placeholder="请填写"   class="form-control isFloat">
+               </div>
+           </div>
+       </form>
+       <div class="btnBox">
+           <div>
+               <input id="btn-ok" class="btn btn-primary btn-its" type="button" value="确定">
+               <input id="btn-cancel" class="btn btn-default btn-its" type="button" value="取消">
+           </div>
+       </div>
+   </div>
+</body>
+<script src="../../../../static/itsoftui/plugins/jquery-1.12.4.js" th:src="@{${root}+'/itsoftui/plugins/jquery-1.12.4.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/layer/layer.js" th:src="@{${root}+'/itsoftui/plugins/layer/layer.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jQuery.form.js" th:src="@{${root}+'/itsoftui/plugins/jQuery.form.js'}"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/jquery.validate.js'}" type="text/javascript" ></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/messages_zh.js'}" type="text/javascript"></script>
+<script src="../../../../static/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js" th:src="@{${root}+'/itsoftui/plugins/jquery.validation/1.14.0/validate-methods.js'}" type="text/javascript"></script>
+
+<script src="../../../../static/itsoftui/js/itsoftui.js" th:src="@{${root}+'/itsoftui/js/itsoftui.js'}"></script>
+<script>
+   var index=parent.layer.getFrameIndex(window.name);
+   var isSave = false;
+   var loadingindex;
+  $(function () {
+      //验证
+      $('#addform').validate({
+        rules:{
+            name:{
+                required: true,
+            },
+            number:{
+                required: true,
+            }
+        },
+        onkeyup: false,
+        focusCleanup: false, //当为false时，验证无效时，没有焦点响应
+        success: "valid",
+        submitHandler: function(form) {
+          $(form).ajaxSubmit({
+              beforeSend: function () {
+                  if (isSave) {
+                      parent.ITSOFT.tools.showMsg("error", "请不要重复提交");
+                      return false;
+                  }
+                  isSave = true;
+                  loadingindex = parent.ITSOFT.itWin.msg("正在提交数据",16);
+              },
+              success: function(data) {
+                //提交成功后
+                isSave = false;
+                parent.ITSOFT.itWin.close(loadingindex);
+                if(data.errorCode==0){
+                    var tree = parent.dataTree;
+                    if (data.data.type == 'add'){
+                        if (tree.isOpen()) {
+                            if (tree.getChildCount() > 0) {
+                                tree.addNode(tree.getSelectNode(), data.data.obj.id, data.data.obj.name);
+                            } else {
+                                tree.closeNode(tree.getSelectNodeValue().value);
+                                tree.openNode(tree.getSelectNodeValue().value);
+                            }
+                        } else {
+                            if (tree.getChildCount() > 0) {
+                                tree.openNode(tree.getSelectNodeValue().value);
+                                tree.addNode(tree.getSelectNode(), data.data.obj.id, data.data.obj.name);
+                            } else {
+                                tree.openNode(tree.getSelectNodeValue().value);
+                            }
+                        }
+                    } else{
+                        tree.editNode(data.data.obj.name);
+                    }
+                    parent.ITSOFT.tools.showMsg("ok",data.message);
+                    parent.ITSOFT.itWin.close(index);
+                }else{
+                    parent.ITSOFT.tools.showMsg("error",data.message);
+                }
+              },
+              error:function(){
+                  isSave = false;
+                  parent.ITSOFT.itWin.close(loadingindex);
+                  parent.ITSOFT.tools.showMsg("error", "提交失败")
+              }
+          });
+        }
+      });
+
+    $("#btn-ok").on('click', function(event) {
+      $("#addform").submit();
+    });
+    $("#btn-cancel").on('click', function(event) {
+       parent.ITSOFT.itWin.close(index);
+    });
+  })
+</script>
+</html>
