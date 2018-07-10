@@ -8,6 +8,7 @@ import com.winterchen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,8 +34,8 @@ public class UserServiceImpl implements UserService {
     public PageInfo<User> findAllUser(int pageNum, int pageSize) {
         //将参数传给这个方法就可以实现物理分页了，非常简单。
         PageHelper.startPage(pageNum, pageSize);
-        List<User> userDomains = userMapper.selectAll();
-        PageInfo result = new PageInfo(userDomains);
+//        List<User> userDomains = userMapper.selectByPrimaryKey(1);
+        PageInfo result = new PageInfo(new ArrayList());
         return result;
     }
 
